@@ -5,7 +5,7 @@
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
 
-    <DocumentationFile>$(MSBuildProjectDirectory)/bin/doc/Yoakke.$(MSBuildProjectName).xml</DocumentationFile>
+    <DocumentationFile>$(MSBuildProjectDirectory)/bin/doc/$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>
