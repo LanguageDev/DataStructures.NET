@@ -96,12 +96,53 @@ public class BinarySearchTreeBenchmarks
         }
     }
 
+    private sealed class BstSetWithIComparer
+    {
+        private Node? root;
+        private IComparer<int> comparer = Comparer<int>.Default;
+
+        public bool Contains(int n) => BinarySearchTree.Search(
+            root: this.root,
+            nodeAdapter: default(NodeAdapter),
+            key: n,
+            keyComparer: this.comparer).Node is not null;
+
+        public bool Add(int n)
+        {
+            var insert = BinarySearchTree.Insert(
+                root: this.root,
+                nodeAdapter: default(NodeAdapter),
+                key: n,
+                data: false,
+                keyComparer: this.comparer);
+            this.root = insert.Root;
+            return insert.Inserted is not null;
+        }
+
+        public bool Remove(int n)
+        {
+            var node = BinarySearchTree.Search(
+                root: this.root,
+                nodeAdapter: default(NodeAdapter),
+                key: n,
+                keyComparer: this.comparer).Node;
+            if (node is null) return false;
+            this.root = BinarySearchTree.Delete(
+                root: this.root,
+                node: node,
+                nodeAdapter: default(NodeAdapter));
+            return true;
+        }
+    }
+
     [Params(100, 1000, 10000)]
     public int ElementCount { get; set; }
 
     private List<int> numbers = new();
     private BstSet ourSet = new();
+    private BstSetWithIComparer ourIComparerSet = new();
     private BinaryTree.BinaryTree<int> marusykSet = new();
+    private SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
     [GlobalSetup]
     public void Setup()
@@ -112,7 +153,9 @@ public class BinarySearchTreeBenchmarks
             this.numbers.Add(rnd.Next(this.ElementCount * 2));
             var toRemove = rnd.Next(this.ElementCount * 2);
             this.ourSet.Add(toRemove);
+            this.ourIComparerSet.Add(toRemove);
             this.marusykSet.Add(toRemove);
+            this.schuchmannSet.Insert(toRemove);
         }
     }
 
@@ -130,6 +173,19 @@ public class BinarySearchTreeBenchmarks
     }
 
     [Benchmark]
+    public void DataStructuresNET_IComparerBstAdd()
+    {
+        var bst = new BstSetWithIComparer();
+        foreach (var item in this.numbers) bst.Add(item);
+    }
+
+    [Benchmark]
+    public void DataStructuresNET_IComparerBstRemove()
+    {
+        foreach (var item in this.numbers) this.ourIComparerSet.Remove(item);
+    }
+
+    [Benchmark]
     public void Marusyk_BinaryTreeAdd()
     {
         var bst = new BinaryTree.BinaryTree<int>();
@@ -140,5 +196,22 @@ public class BinarySearchTreeBenchmarks
     public void Marusyk_BinaryTreeRemove()
     {
         foreach (var item in this.numbers) this.marusykSet.Remove(item);
+    }
+
+    [Benchmark]
+    public void Schuchmann_BinarySearchTreeAdd()
+    {
+        var bst = new SchuchmannBst.BinarySearchTree<int>();
+        foreach (var item in this.numbers) bst.Insert(item);
+    }
+
+    [Benchmark]
+    public void Schuchmann_BinarySearchTreeRemove()
+    {
+        foreach (var item in this.numbers)
+        {
+            var n = this.schuchmannSet.Search(item);
+            if (n is not null) this.schuchmannSet.DeleteNode(n);
+        }
     }
 }
