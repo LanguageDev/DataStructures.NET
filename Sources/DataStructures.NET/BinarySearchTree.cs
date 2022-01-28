@@ -310,6 +310,7 @@ public static class BinarySearchTree
             var h = hint.Value;
             if (h == Child.Left) nodeAdapter.SetLeftChild(found!, newNode);
             else nodeAdapter.SetRightChild(found!, newNode);
+            nodeAdapter.SetParent(newNode, found!);
             return new(Root: root!, Inserted: newNode);
         }
         // Otherwise, this has to be a new root
@@ -336,19 +337,10 @@ public static class BinarySearchTree
         void Shift(TNode u, TNode? v)
         {
             var uParent = nodeAdapter.GetParent(u);
-            if (uParent is null)
-            {
-                root = v;
-                if (v is not null) nodeAdapter.SetParent(v, default);
-            }
-            else if (ReferenceEquals(u, nodeAdapter.GetLeftChild(uParent)))
-            {
-                nodeAdapter.SetLeftChild(uParent, v);
-            }
-            else
-            {
-                nodeAdapter.SetRightChild(uParent, v);
-            }
+            if (uParent is null) root = v;
+            else if (ReferenceEquals(u, nodeAdapter.GetLeftChild(uParent))) nodeAdapter.SetLeftChild(uParent, v);
+            else nodeAdapter.SetRightChild(uParent, v);
+            if (v is not null) nodeAdapter.SetParent(v, uParent);
         }
 
         if (nodeAdapter.GetLeftChild(node) is null)
@@ -368,10 +360,14 @@ public static class BinarySearchTree
             if (!ReferenceEquals(nodeAdapter.GetParent(y), node))
             {
                 Shift(y, nodeAdapter.GetRightChild(y));
-                nodeAdapter.SetRightChild(y, nodeAdapter.GetRightChild(node));
+                var nodeRight = nodeAdapter.GetRightChild(node);
+                nodeAdapter.SetRightChild(y, nodeRight);
+                if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
             }
             Shift(node, y);
-            nodeAdapter.SetLeftChild(y, nodeAdapter.GetLeftChild(node));
+            var nodeLeft = nodeAdapter.GetLeftChild(node);
+            nodeAdapter.SetLeftChild(y, nodeLeft);
+            if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
         }
         return root;
     }
