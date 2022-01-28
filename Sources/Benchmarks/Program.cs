@@ -43,5 +43,5 @@ public class BinarySearchTreeCodegenBenchmarks
             root: root,
             nodeAdapter: default(NodeAdapter),
             key: k,
-            keyComparer: default(IntComparer));
+            keyComparer: default(IntComparer)).Found;
 }

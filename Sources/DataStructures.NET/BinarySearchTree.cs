@@ -11,6 +11,22 @@ namespace DataStructures.NET;
 public static class BinarySearchTree
 {
     /// <summary>
+    /// An enumeration describing the two children of a node.
+    /// </summary>
+    public enum Child
+    {
+        /// <summary>
+        /// The left child.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// The right child.
+        /// </summary>
+        Right,
+    }
+
+    /// <summary>
     /// Child accessor functionality.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
@@ -47,6 +63,16 @@ public static class BinarySearchTree
     }
 
     /// <summary>
+    /// Represents the result of a tree-search.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    /// <param name="Found">The exact match found.</param>
+    /// <param name="Hint">The hint for insertion, if an exact match is not found.</param>
+    public readonly record struct SearchResult<TNode>(
+        TNode? Found = default,
+        (TNode Node, Child Child)? Hint = null);
+
+    /// <summary>
     /// Performs a search on a BST.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
@@ -59,7 +85,7 @@ public static class BinarySearchTree
     /// <param name="keyComparer">The key comparer.</param>
     /// <returns>The node with key <paramref name="key"/>, or null if not found.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNode? Search<TNode, TNodeAdapter, TKey, TKeyComparer>(
+    public static SearchResult<TNode> Search<TNode, TNodeAdapter, TKey, TKeyComparer>(
         TNode? root,
         TNodeAdapter nodeAdapter,
         TKey key,
@@ -67,14 +93,26 @@ public static class BinarySearchTree
         where TNodeAdapter : IChildSelector<TNode>, IKeySelector<TNode, TKey>
         where TKeyComparer : IComparer<TKey>
     {
+        (TNode Node, Child Child)? hint = null;
         while (root is not null)
         {
             var rootKey = nodeAdapter.GetKey(root);
             var cmp = keyComparer.Compare(key, rootKey);
-            if (cmp < 0) root = nodeAdapter.GetLeftChild(root);
-            else if (cmp > 0) root = nodeAdapter.GetRightChild(root);
-            else return root;
+            if (cmp < 0)
+            {
+                hint = (root, Child.Left);
+                root = nodeAdapter.GetLeftChild(root);
+            }
+            else if (cmp > 0)
+            {
+                hint = (root, Child.Right);
+                root = nodeAdapter.GetRightChild(root);
+            }
+            else
+            {
+                return new(Found: root);
+            }
         }
-        return default;
+        return new(Hint: hint);
     }
 }
