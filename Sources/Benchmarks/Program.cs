@@ -38,10 +38,13 @@ public class BinarySearchTreeCodegenBenchmarks
     }
 
     [CAAnalyze(null, 0)]
-    public static Node? Search(Node? root, int k) =>
-        BinarySearchTree.Search(
+    public static Node? Search(Node? root, int k)
+    {
+        var ins = BinarySearchTree.Search(
             root: root,
             nodeAdapter: default(NodeAdapter),
             key: k,
-            keyComparer: default(IntComparer)).Found;
+            keyComparer: default(IntComparer));
+        return ins.Hint is null ? ins.Node : null;
+    }
 }

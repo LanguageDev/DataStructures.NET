@@ -13,7 +13,7 @@ public static class BinarySearchTree
     /// <summary>
     /// An enumeration describing the two children of a node.
     /// </summary>
-    public enum Child
+    public enum Child : byte
     {
         /// <summary>
         /// The left child.
@@ -66,11 +66,11 @@ public static class BinarySearchTree
     /// Represents the result of a tree-search.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
-    /// <param name="Found">The exact match found.</param>
+    /// <param name="Node">The node found. This is the exact match, if <paramref name="Hint"/> is null.</param>
     /// <param name="Hint">The hint for insertion, if an exact match is not found.</param>
     public readonly record struct SearchResult<TNode>(
-        TNode? Found = default,
-        (TNode Node, Child Child)? Hint = null);
+        TNode? Node,
+        Child? Hint = null);
 
     /// <summary>
     /// Performs a search on a BST.
@@ -93,26 +93,29 @@ public static class BinarySearchTree
         where TNodeAdapter : IChildSelector<TNode>, IKeySelector<TNode, TKey>
         where TKeyComparer : IComparer<TKey>
     {
-        (TNode Node, Child Child)? hint = null;
+        TNode? prev = default;
+        Child? hint = null;
         while (root is not null)
         {
             var rootKey = nodeAdapter.GetKey(root);
             var cmp = keyComparer.Compare(key, rootKey);
             if (cmp < 0)
             {
-                hint = (root, Child.Left);
+                hint = Child.Left;
+                prev = root;
                 root = nodeAdapter.GetLeftChild(root);
             }
             else if (cmp > 0)
             {
-                hint = (root, Child.Right);
+                hint = Child.Right;
+                prev = root;
                 root = nodeAdapter.GetRightChild(root);
             }
             else
             {
-                return new(Found: root);
+                return new(Node: root);
             }
         }
-        return new(Hint: hint);
+        return new(Node: prev, Hint: hint);
     }
 }
