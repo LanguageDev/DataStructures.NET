@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using DataStructures.NET;
 using Xunit;
 using Fuzzer;
-using BstSet = DataStructures.NET.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
 using DataStructures.NET.External;
+using BstSet = DataStructures.NET.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
 
 namespace Tests;
 

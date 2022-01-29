@@ -362,7 +362,7 @@ public static class BinarySearchTree
         {
             // 2 children
             var y = Successor(node, nodeAdapter);
-            if (!ReferenceEquals(nodeAdapter.GetParent(y), node))
+            if (!ReferenceEquals(nodeAdapter.GetParent(y!), node))
             {
                 Shift(y, nodeAdapter.GetRightChild(y));
                 var nodeRight = nodeAdapter.GetRightChild(node);

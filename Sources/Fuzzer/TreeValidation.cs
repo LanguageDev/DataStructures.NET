@@ -120,6 +120,38 @@ public static class TreeValidation
         if (remaining.Count > 0) throw new ValidationException($"Content error: The elements [{string.Join(", ", remaining)}] were not found in the tree, but were expected");
     }
 
+    public static void ValidateBalanceAndHeight<TNode, TNodeAdapter>(
+        TNode? root,
+        TNodeAdapter nodeAdapter)
+        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+                             AvlTree.IHeightSelector<TNode>
+    {
+        int Impl(TNode? node)
+        {
+            if (node is null) return 0;
+
+            var left = nodeAdapter.GetLeftChild(node);
+            var right = nodeAdapter.GetRightChild(node);
+
+            var leftExpHeight = Impl(left);
+            var leftActHeight = left is null ? 0 : nodeAdapter.GetHeight(left);
+            if (leftExpHeight != leftActHeight) throw new ValidationException($"Height error: The left node's height ({leftActHeight}) does not match the expected ({leftExpHeight})");
+
+            var rightExpHeight = Impl(right);
+            var rightActHeight = right is null ? 0 : nodeAdapter.GetHeight(right);
+            if (rightExpHeight != rightActHeight) throw new ValidationException($"Height error: The right node's height ({rightActHeight}) does not match the expected ({rightExpHeight})");
+
+            var balance = leftActHeight - rightActHeight;
+            if (!(-1 <= balance && balance <= 1)) throw new ValidationException($"Balance error: The node is unbalanced (balance factor {balance})");
+
+            return 1 + Math.Max(leftActHeight, rightActHeight);
+        }
+
+        var rootExpHeight = Impl(root);
+        var rootActHeight = root is null ? 0 : nodeAdapter.GetHeight(root);
+        if (rootExpHeight != rootActHeight) throw new ValidationException($"Height error: The root's height ({rootActHeight}) does not match the expected ({rootExpHeight})");
+    }
+
     public static void AssertTreeEquals<TNode, TNodeAdapter>(
         TNode? root1,
         TNode? root2,
