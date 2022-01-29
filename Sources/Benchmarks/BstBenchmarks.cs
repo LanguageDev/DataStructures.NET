@@ -13,6 +13,7 @@ using DataStructures.NET;
 
 namespace Benchmarks;
 
+[MemoryDiagnoser]
 public class BstInsertBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>
@@ -72,6 +73,7 @@ public class BstInsertBenchmarks
     }
 }
 
+[MemoryDiagnoser]
 public class BstDeleteBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>

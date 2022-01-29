@@ -14,6 +14,7 @@ using Towel;
 
 namespace Benchmarks;
 
+[MemoryDiagnoser]
 public class AvlTreeInsertBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>, Towel.IFunc<int, int, Towel.CompareResult>
@@ -73,6 +74,7 @@ public class AvlTreeInsertBenchmarks
     }
 }
 
+[MemoryDiagnoser]
 public class AvlTreeDeleteBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>, Towel.IFunc<int, int, Towel.CompareResult>
