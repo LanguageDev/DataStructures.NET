@@ -14,7 +14,7 @@ internal class FuzzerException : Exception
     }
 
     public FuzzerException(string message, string testCase, string operation)
-        : base($"{message}\nTest case:\n  Tree: {testCase}\n  Operation: {operation}")
+        : base($"{message}\nTest case:\n  Test case: {testCase}\n  Operation: {operation}")
     {
     }
 }
