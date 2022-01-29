@@ -17,18 +17,19 @@ public class BstInsertBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y) => x - y;
     }
 
     [Params(100, 1000, 10000)]
     public int ElementCount { get; set; }
 
-    private List<int> numbers = new();
+    private readonly List<int> numbers = new();
 
-    private BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
-    private BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
-    private BinaryTree.BinaryTree<int> marusykSet = new();
-    private SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
+    private readonly BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
+    private readonly BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinaryTree.BinaryTree<int> marusykSet = new();
+    private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -81,13 +82,13 @@ public class BstDeleteBenchmarks
     [Params(100, 1000, 10000)]
     public int ElementCount { get; set; }
 
-    private List<int> numbersToAdd = new();
-    private List<int> numbersToRemove = new();
+    private readonly List<int> numbersToAdd = new();
+    private readonly List<int> numbersToRemove = new();
 
-    private BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
-    private BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
-    private BinaryTree.BinaryTree<int> marusykSet = new();
-    private SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
+    private readonly BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
+    private readonly BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinaryTree.BinaryTree<int> marusykSet = new();
+    private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()

@@ -15,6 +15,7 @@
     <PackageReference Include="CodegenAnalysis.Benchmarks" Version="0.1.0-alpha-1639660460-222ddd2" />
     
     <PackageReference Include="BinaryTree" Version="5.2.0" />
+    <PackageReference Include="Towel" Version="1.0.40" />
   </ItemGroup>
 
 </Project>
