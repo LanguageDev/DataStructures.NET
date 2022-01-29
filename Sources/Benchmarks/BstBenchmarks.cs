@@ -20,7 +20,7 @@ public class BstInsertBenchmarks
         public int Compare(int x, int y) => x - y;
     }
 
-    [Params(100, 10000, 100000)]
+    [Params(100, 1000, 10000)]
     public int ElementCount { get; set; }
 
     private List<int> numbers = new();
@@ -78,7 +78,7 @@ public class BstDeleteBenchmarks
         public int Compare(int x, int y) => x - y;
     }
 
-    [Params(100, 10000, 100000)]
+    [Params(100, 1000, 10000)]
     public int ElementCount { get; set; }
 
     private List<int> numbersToAdd = new();
