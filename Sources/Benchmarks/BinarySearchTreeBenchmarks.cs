@@ -135,80 +135,94 @@ public class BinarySearchTreeBenchmarks
         }
     }
 
-    [Params(100, 1000, 10000)]
+    [Params(100, 10000, 100000)]
     public int ElementCount { get; set; }
 
-    private List<int> numbers = new();
+    private List<int> numbersToAdd = new();
+    private List<int> numbersToRemove = new();
     private BstSet ourSet = new();
     private BstSetWithIComparer ourIComparerSet = new();
     private BinaryTree.BinaryTree<int> marusykSet = new();
     private SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
     [GlobalSetup]
-    public void Setup()
+    public void GlobalSetup()
     {
         var rnd = new Random(63463523);
         for (var i = 0; i < this.ElementCount; ++i)
         {
-            this.numbers.Add(rnd.Next(this.ElementCount * 2));
-            var toRemove = rnd.Next(this.ElementCount * 2);
-            this.ourSet.Add(toRemove);
-            this.ourIComparerSet.Add(toRemove);
-            this.marusykSet.Add(toRemove);
-            this.schuchmannSet.Insert(toRemove);
+            this.numbersToAdd.Add(rnd.Next(this.ElementCount * 2));
+            this.numbersToRemove.Add(this.ElementCount * 2);
         }
     }
 
+    [IterationSetup]
+    public void IterationSetup()
+    {
+        this.ourSet = new();
+        this.ourIComparerSet = new();
+        this.marusykSet = new();
+        this.schuchmannSet = new();
+
+        foreach (var item in this.numbersToAdd)
+        {
+            this.ourSet.Add(item);
+            this.ourIComparerSet.Add(item);
+            this.marusykSet.Add(item);
+            this.schuchmannSet.Insert(item);
+        }
+    }
+    
     [Benchmark]
     public void DataStructuresNET_BstAdd()
     {
         var bst = new BstSet();
-        foreach (var item in this.numbers) bst.Add(item);
+        foreach (var item in this.numbersToAdd) bst.Add(item);
     }
 
     [Benchmark]
     public void DataStructuresNET_BstRemove()
     {
-        foreach (var item in this.numbers) this.ourSet.Remove(item);
+        foreach (var item in this.numbersToRemove) this.ourSet.Remove(item);
     }
 
     [Benchmark]
     public void DataStructuresNET_IComparerBstAdd()
     {
         var bst = new BstSetWithIComparer();
-        foreach (var item in this.numbers) bst.Add(item);
+        foreach (var item in this.numbersToAdd) bst.Add(item);
     }
 
     [Benchmark]
     public void DataStructuresNET_IComparerBstRemove()
     {
-        foreach (var item in this.numbers) this.ourIComparerSet.Remove(item);
+        foreach (var item in this.numbersToRemove) this.ourIComparerSet.Remove(item);
     }
 
     [Benchmark]
     public void Marusyk_BinaryTreeAdd()
     {
         var bst = new BinaryTree.BinaryTree<int>();
-        foreach (var item in this.numbers) bst.Add(item);
+        foreach (var item in this.numbersToAdd) bst.Add(item);
     }
 
     [Benchmark]
     public void Marusyk_BinaryTreeRemove()
     {
-        foreach (var item in this.numbers) this.marusykSet.Remove(item);
+        foreach (var item in this.numbersToRemove) this.marusykSet.Remove(item);
     }
 
     [Benchmark]
     public void Schuchmann_BinarySearchTreeAdd()
     {
         var bst = new SchuchmannBst.BinarySearchTree<int>();
-        foreach (var item in this.numbers) bst.Insert(item);
+        foreach (var item in this.numbersToAdd) bst.Insert(item);
     }
 
     [Benchmark]
     public void Schuchmann_BinarySearchTreeRemove()
     {
-        foreach (var item in this.numbers)
+        foreach (var item in this.numbersToRemove)
         {
             var n = this.schuchmannSet.Search(item);
             if (n is not null) this.schuchmannSet.DeleteNode(n);
