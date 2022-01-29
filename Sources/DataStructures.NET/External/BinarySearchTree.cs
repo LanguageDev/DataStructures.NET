@@ -385,6 +385,7 @@ public static class BinarySearchTree
     /// <param name="root">The root of the subtree to rotate.</param>
     /// <param name="nodeAdapter">The node adapter.</param>
     /// <returns>The new root of the subtree.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TNode RotateLeft<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
@@ -416,6 +417,7 @@ public static class BinarySearchTree
     /// <param name="root">The root of the subtree to rotate.</param>
     /// <param name="nodeAdapter">The node adapter.</param>
     /// <returns>The new root of the subtree.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TNode RotateRight<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
