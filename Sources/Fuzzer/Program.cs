@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using DataStructures.NET;
+using DataStructures.NET.Trees.Linked;
 using Fuzzer;
-using BstSet = DataStructures.NET.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
 
 internal class Program
 {
@@ -20,7 +20,7 @@ internal class Program
         {
             if (epoch % 100 == 0) Console.WriteLine($"Epoch {epoch}...");
 
-            var tested = new BinarySearchTreeSet<int, IComparer<int>>(Comparer<int>.Default);
+            var tested = new BstSet(Comparer<int>.Default);
             var oracle = new HashSet<int>();
             try
             {

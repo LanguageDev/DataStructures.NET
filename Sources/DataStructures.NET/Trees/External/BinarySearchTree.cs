@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace DataStructures.NET.External;
+namespace DataStructures.NET.Trees.External;
 
 /// <summary>
 /// Operations on a binary search tree.
@@ -364,14 +363,14 @@ public static class BinarySearchTree
             var y = Successor(node, nodeAdapter);
             if (!ReferenceEquals(nodeAdapter.GetParent(y!), node))
             {
-                Shift(y, nodeAdapter.GetRightChild(y));
+                Shift(y!, nodeAdapter.GetRightChild(y!));
                 var nodeRight = nodeAdapter.GetRightChild(node);
-                nodeAdapter.SetRightChild(y, nodeRight);
+                nodeAdapter.SetRightChild(y!, nodeRight);
                 if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
             }
             Shift(node, y);
             var nodeLeft = nodeAdapter.GetLeftChild(node);
-            nodeAdapter.SetLeftChild(y, nodeLeft);
+            nodeAdapter.SetLeftChild(y!, nodeLeft);
             if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
         }
         return root;

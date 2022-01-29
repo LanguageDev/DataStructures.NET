@@ -1,15 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataStructures.NET;
 using Xunit;
 using Fuzzer;
-using DataStructures.NET.External;
-using BstSet = DataStructures.NET.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using DataStructures.NET.Trees.External;
 
-namespace Tests;
+namespace Tests.Trees;
 
 public class BstTests
 {

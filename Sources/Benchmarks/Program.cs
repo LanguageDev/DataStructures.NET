@@ -1,10 +1,5 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Running;
-using Benchmarks;
-using CodegenAnalysis;
-using CodegenAnalysis.Benchmarks;
-using DataStructures.NET;
+using Benchmarks.Trees;
 
 // CodegenBenchmarkRunner.Run<BinarySearchTreeCodegenBenchmarks>();
 BenchmarkRunner.Run<AvlTreeInsertBenchmarks>();

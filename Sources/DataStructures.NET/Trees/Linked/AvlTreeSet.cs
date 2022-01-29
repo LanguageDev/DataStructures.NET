@@ -6,10 +6,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using DataStructures.NET.External;
+using DataStructures.NET.Trees.External;
 
-namespace DataStructures.NET;
+namespace DataStructures.NET.Trees.Linked;
 
 // TODO: Finish implementation
 

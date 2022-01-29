@@ -6,8 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using DataStructures.NET.External;
+using DataStructures.NET.Trees.External;
 
 namespace Fuzzer;
 

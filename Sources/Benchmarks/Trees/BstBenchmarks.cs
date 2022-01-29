@@ -4,14 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using DataStructures.NET;
+using DataStructures.NET.Trees.Linked;
 
-namespace Benchmarks;
+namespace Benchmarks.Trees;
 
 [MemoryDiagnoser]
 public class BstInsertBenchmarks

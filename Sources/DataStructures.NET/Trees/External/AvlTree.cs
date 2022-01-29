@@ -5,9 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace DataStructures.NET.External;
+namespace DataStructures.NET.Trees.External;
 
 /// <summary>
 /// Operations on an AVL tree.
@@ -276,9 +275,9 @@ public static class AvlTree
             if (!ReferenceEquals(yParent, node))
             {
                 updateStart = yParent;
-                Shift(y, nodeAdapter.GetRightChild(y));
+                Shift(y!, nodeAdapter.GetRightChild(y!));
                 var nodeRight = nodeAdapter.GetRightChild(node);
-                nodeAdapter.SetRightChild(y, nodeRight);
+                nodeAdapter.SetRightChild(y!, nodeRight);
                 if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
             }
             else
@@ -287,7 +286,7 @@ public static class AvlTree
             }
             Shift(node, y);
             var nodeLeft = nodeAdapter.GetLeftChild(node);
-            nodeAdapter.SetLeftChild(y, nodeLeft);
+            nodeAdapter.SetLeftChild(y!, nodeLeft);
             if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
         }
 

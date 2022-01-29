@@ -4,14 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Fuzzer;
 using Xunit;
-using AvlTreeSet = DataStructures.NET.AvlTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using AvlTreeSet = DataStructures.NET.Trees.Linked.AvlTreeSet<int, System.Collections.Generic.IComparer<int>>;
 
-namespace Tests;
+namespace Tests.Trees;
 
 public class AvlTreeTests
 {
@@ -99,14 +96,14 @@ public class AvlTreeTests
     public void InsertAbcInAllOrders(string abc)
     {
         var set = new AvlTreeSet(Comparer<int>.Default);
-        ValidateTree(set.Root);
+        ValidateTree(set);
         foreach (var letter in abc)
         {
             Assert.True(set.Add(letter));
-            ValidateTree(set.Root);
+            ValidateTree(set);
         }
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('b')
             {
                 Left = new('a'),
@@ -120,11 +117,11 @@ public class AvlTreeTests
     public void Case1Insert15()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase1Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(15));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(15)
             {
                 Left = new(4),
@@ -136,11 +133,11 @@ public class AvlTreeTests
     public void Case2Insert15()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase2Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(15));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(9)
             {
                 Left = new(4)
@@ -159,11 +156,11 @@ public class AvlTreeTests
     public void Case3Insert15()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase3Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(15));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(9)
             {
                 Left = new(4)
@@ -195,11 +192,11 @@ public class AvlTreeTests
     public void Case1Insert8()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase1Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(8));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(8)
             {
                 Left = new(4),
@@ -211,11 +208,11 @@ public class AvlTreeTests
     public void Case2Insert8()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase2Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(8));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(9)
             {
                 Left = new(4)
@@ -234,11 +231,11 @@ public class AvlTreeTests
     public void Case3Insert8()
     {
         var set = new AvlTreeSet(Comparer<int>.Default) { Root = InsertCase3Root };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Add(8));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(9)
             {
                 Left = new(4)
@@ -278,11 +275,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('a'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('c')
             {
                 Left = new('b'),
@@ -304,11 +301,11 @@ public class AvlTreeTests
                 Right = new('d'),
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('d'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('b')
             {
                 Left = new('a'),
@@ -330,11 +327,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('a'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('c')
             {
                 Left = new('b'),
@@ -356,11 +353,11 @@ public class AvlTreeTests
                 Right = new('d'),
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('d'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('b')
             {
                 Left = new('a'),
@@ -389,11 +386,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('a'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('e')
             {
                 Left = new('c')
@@ -429,11 +426,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove('g'));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new('c')
             {
                 Left = new('b')
@@ -480,11 +477,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove(1));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(8)
             {
                 Left = new(5)
@@ -524,11 +521,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove(0));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(11)
             {
                 Left = new(7),
@@ -547,11 +544,11 @@ public class AvlTreeTests
                 Right = new(19),
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove(8));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(19)
             {
                 Left = new(5),
@@ -587,11 +584,11 @@ public class AvlTreeTests
                 },
             })
         };
-        ValidateTree(set.Root);
+        ValidateTree(set);
         Assert.True(set.Remove(41));
-        ValidateTree(set.Root);
+        ValidateTree(set);
         AssertTreeEquals(
-            set.Root,
+            set,
             SetParentAndHeight(new(45)
             {
                 Left = new(20)
