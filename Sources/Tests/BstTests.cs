@@ -7,21 +7,28 @@ using DataStructures.NET;
 using Xunit;
 using Fuzzer;
 using BstSet = DataStructures.NET.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using DataStructures.NET.External;
 
 namespace Tests;
 
 public class BstTests
 {
-    private static void ValidateTree(BstSet bst) =>
-        TreeValidation.ValidateAdjacency(bst.Root, default(BstSet.NodeAdapter));
+    private static void ValidateTree(BstSet.Node? root) =>
+        TreeValidation.ValidateAdjacency(root, default(BstSet.NodeAdapter));
+
+    private static void ValidateTree(BstSet bst) => ValidateTree(bst.Root);
+
+    private static void AssertTreeEquals(
+        BstSet.Node? root1,
+        BstSet.Node? root2) => TreeValidation.AssertTreeEquals(
+            root1: root1,
+            root2: root2,
+            nodeAdapter: default(BstSet.NodeAdapter),
+            nodeEquals: (n1, n2) => n1.Key == n2.Key);
 
     private static void AssertTreeEquals(
         BstSet bst,
-        BstSet.Node? node) => TreeValidation.AssertTreeEquals(
-            root1: bst.Root,
-            root2: node,
-            nodeAdapter: default(BstSet.NodeAdapter),
-            nodeEquals: (n1, n2) => n1.Key == n2.Key);
+        BstSet.Node? node) => AssertTreeEquals(bst.Root, node);
 
     private static BstSet.Node? SetParent(BstSet.Node? root)
     {
@@ -262,6 +269,62 @@ public class BstTests
                 {
                     Left = new(7),
                 },
+            });
+    }
+
+    [Fact]
+    public void RotateRight()
+    {
+        var root = SetParent(new('Q')
+        {
+            Left = new('P')
+            {
+                Left = new('A'),
+                Right = new('B'),
+            },
+            Right = new('C'),
+        });
+        ValidateTree(root);
+        root = BinarySearchTree.RotateRight(root!, default(BstSet.NodeAdapter));
+        ValidateTree(root);
+        AssertTreeEquals(
+            root,
+            new('P')
+            {
+                Left = new('A'),
+                Right = new('Q')
+                {
+                    Left = new('B'),
+                    Right = new('C'),
+                },
+            });
+    }
+
+    [Fact]
+    public void RotateLeft()
+    {
+        var root = SetParent(new('P')
+        {
+            Left = new('A'),
+            Right = new('Q')
+            {
+                Left = new('B'),
+                Right = new('C'),
+            },
+        });
+        ValidateTree(root);
+        root = BinarySearchTree.RotateLeft(root!, default(BstSet.NodeAdapter));
+        ValidateTree(root);
+        AssertTreeEquals(
+            root,
+            new('Q')
+            {
+                Left = new('P')
+                {
+                    Left = new('A'),
+                    Right = new('B'),
+                },
+                Right = new('C'),
             });
     }
 }

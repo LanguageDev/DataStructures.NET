@@ -376,4 +376,66 @@ public static class BinarySearchTree
         }
         return root;
     }
+
+    /// <summary>
+    /// Rotates the subtree left.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    /// <typeparam name="TNodeAdapter">The node adapter type.</typeparam>
+    /// <param name="root">The root of the subtree to rotate.</param>
+    /// <param name="nodeAdapter">The node adapter.</param>
+    /// <returns>The new root of the subtree.</returns>
+    public static TNode RotateLeft<TNode, TNodeAdapter>(
+        TNode root,
+        TNodeAdapter nodeAdapter)
+        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+    {
+        var p = nodeAdapter.GetParent(root);
+        var y = nodeAdapter.GetRightChild(root)
+             ?? throw new InvalidOperationException("The right child can not be null");
+        if (p is not null)
+        {
+            var pLeft = nodeAdapter.GetLeftChild(p);
+            if (ReferenceEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, y);
+            else nodeAdapter.SetRightChild(p, y);
+        }
+        nodeAdapter.SetParent(y, p);
+        var t2 = nodeAdapter.GetLeftChild(y);
+        nodeAdapter.SetLeftChild(y, root);
+        nodeAdapter.SetParent(root, y);
+        nodeAdapter.SetRightChild(root, t2);
+        if (t2 is not null) nodeAdapter.SetParent(t2, root);
+        return y;
+    }
+
+    /// <summary>
+    /// Rotates the subtree right.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    /// <typeparam name="TNodeAdapter">The node adapter type.</typeparam>
+    /// <param name="root">The root of the subtree to rotate.</param>
+    /// <param name="nodeAdapter">The node adapter.</param>
+    /// <returns>The new root of the subtree.</returns>
+    public static TNode RotateRight<TNode, TNodeAdapter>(
+        TNode root,
+        TNodeAdapter nodeAdapter)
+        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+    {
+        var p = nodeAdapter.GetParent(root);
+        var x = nodeAdapter.GetLeftChild(root)
+             ?? throw new InvalidOperationException("The left child can not be null");
+        if (p is not null)
+        {
+            var pLeft = nodeAdapter.GetLeftChild(p);
+            if (ReferenceEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, x);
+            else nodeAdapter.SetRightChild(p, x);
+        }
+        nodeAdapter.SetParent(x, p);
+        var t2 = nodeAdapter.GetRightChild(x);
+        nodeAdapter.SetRightChild(x, root);
+        nodeAdapter.SetParent(root, x);
+        nodeAdapter.SetLeftChild(root, t2);
+        if (t2 is not null) nodeAdapter.SetParent(t2, root);
+        return x;
+    }
 }
