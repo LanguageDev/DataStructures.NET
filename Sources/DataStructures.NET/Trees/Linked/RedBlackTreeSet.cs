@@ -156,12 +156,10 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
             key: element,
             keyComparer: this.comparer).Found;
         if (node is null) return false;
-        /*
         this.Root = RedBlackTree.Delete(
             root: this.Root,
             node: node,
             nodeAdapter: default(NodeAdapter));
-        */
         --this.Count;
         return true;
     }

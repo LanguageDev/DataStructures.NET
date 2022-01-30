@@ -53,6 +53,6 @@ public class BstCodegenBenchmarks
         return BinarySearchTree.Delete(
             root: root,
             node: node,
-            nodeAdapter: default(BstSet.NodeAdapter));
+            nodeAdapter: default(BstSet.NodeAdapter)).Root;
     }
 }

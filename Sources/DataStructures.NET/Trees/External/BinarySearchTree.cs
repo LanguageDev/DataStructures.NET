@@ -136,6 +136,16 @@ public static class BinarySearchTree
         TNode? Existing = default);
 
     /// <summary>
+    /// Represents the result of a deletion.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    /// <param name="Root">The root of the tree.</param>
+    /// <param name="Parent">The parent of the node that was removed or moved in the tree. This can be used for rebalancing.</param>
+    public readonly record struct DeleteResult<TNode>(
+        TNode? Root,
+        TNode? Parent = default);
+
+    /// <summary>
     /// Retrieves the minimum (leftmost leaf) of a given subtree.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
@@ -329,9 +339,9 @@ public static class BinarySearchTree
     /// <param name="root">The root of the tree.</param>
     /// <param name="node">The node to delete.</param>
     /// <param name="nodeAdapter">The node adapter.</param>
-    /// <returns>The new root of the BST.</returns>
+    /// <returns>The results of the deletion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNode? Delete<TNode, TNodeAdapter>(
+    public static DeleteResult<TNode> Delete<TNode, TNodeAdapter>(
         TNode? root,
         TNode node,
         TNodeAdapter nodeAdapter)
@@ -347,33 +357,42 @@ public static class BinarySearchTree
             if (v is not null) nodeAdapter.SetParent(v, uParent);
         }
 
+        TNode? parent;
         if (nodeAdapter.GetLeftChild(node) is null)
         {
             // 0 or 1 child
+            parent = nodeAdapter.GetParent(node);
             Shift(node, nodeAdapter.GetRightChild(node));
         }
         else if (nodeAdapter.GetRightChild(node) is null)
         {
             // 0 or 1 child
+            parent = nodeAdapter.GetParent(node);
             Shift(node, nodeAdapter.GetLeftChild(node));
         }
         else
         {
             // 2 children
             var y = Successor(node, nodeAdapter);
-            if (!ReferenceEquals(nodeAdapter.GetParent(y!), node))
+            var yParent = nodeAdapter.GetParent(y!);
+            if (!ReferenceEquals(yParent, node))
             {
+                parent = yParent;
                 Shift(y!, nodeAdapter.GetRightChild(y!));
                 var nodeRight = nodeAdapter.GetRightChild(node);
                 nodeAdapter.SetRightChild(y!, nodeRight);
                 if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
+            }
+            else
+            {
+                parent = y;
             }
             Shift(node, y);
             var nodeLeft = nodeAdapter.GetLeftChild(node);
             nodeAdapter.SetLeftChild(y!, nodeLeft);
             if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
         }
-        return root;
+        return new(Root: root, Parent: parent);
     }
 
     /// <summary>

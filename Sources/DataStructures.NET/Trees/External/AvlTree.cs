@@ -241,57 +241,15 @@ public static class AvlTree
                              BinarySearchTree.IParentSelector<TNode>,
                              IHeightSelector<TNode>
     {
-        // NOTE: Mostly copied from BST.Delete
-
-        // NOTE: Same as BST.Delete.Shift
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void Shift(TNode u, TNode? v)
-        {
-            var uParent = nodeAdapter.GetParent(u);
-            if (uParent is null) root = v;
-            else if (ReferenceEquals(u, nodeAdapter.GetLeftChild(uParent))) nodeAdapter.SetLeftChild(uParent, v);
-            else nodeAdapter.SetRightChild(uParent, v);
-            if (v is not null) nodeAdapter.SetParent(v, uParent);
-        }
-
-        TNode? updateStart;
-        if (nodeAdapter.GetLeftChild(node) is null)
-        {
-            // 0 or 1 child
-            updateStart = nodeAdapter.GetParent(node);
-            Shift(node, nodeAdapter.GetRightChild(node));
-        }
-        else if (nodeAdapter.GetRightChild(node) is null)
-        {
-            // 0 or 1 child
-            updateStart = nodeAdapter.GetParent(node);
-            Shift(node, nodeAdapter.GetLeftChild(node));
-        }
-        else
-        {
-            // 2 children
-            var y = BinarySearchTree.Successor(node, nodeAdapter);
-            var yParent = nodeAdapter.GetParent(y!);
-            if (!ReferenceEquals(yParent, node))
-            {
-                updateStart = yParent;
-                Shift(y!, nodeAdapter.GetRightChild(y!));
-                var nodeRight = nodeAdapter.GetRightChild(node);
-                nodeAdapter.SetRightChild(y!, nodeRight);
-                if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
-            }
-            else
-            {
-                updateStart = y;
-            }
-            Shift(node, y);
-            var nodeLeft = nodeAdapter.GetLeftChild(node);
-            nodeAdapter.SetLeftChild(y!, nodeLeft);
-            if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
-        }
+        // First we use BST deletion
+        var deletion = BinarySearchTree.Delete(
+            root: root,
+            node: node,
+            nodeAdapter: nodeAdapter);
+        root = deletion.Root;
 
         // Rebalance upwards
-        for (var n = updateStart; n is not null; n = nodeAdapter.GetParent(n!))
+        for (var n = deletion.Parent; n is not null; n = nodeAdapter.GetParent(n!))
         {
             UpdateHeight(n, nodeAdapter);
             var rebalance = Rebalance(n, nodeAdapter);

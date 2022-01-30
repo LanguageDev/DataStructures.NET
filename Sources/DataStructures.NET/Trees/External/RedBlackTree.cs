@@ -59,7 +59,7 @@ public static class RedBlackTree
     /// <typeparam name="TKey">The key type.</typeparam>
     /// <typeparam name="TData">The inserted data type.</typeparam>
     /// <typeparam name="TKeyComparer">The key comparer type.</typeparam>
-    /// <param name="root">The root of the AVL tree.</param>
+    /// <param name="root">The root of the R/B tree.</param>
     /// <param name="nodeAdapter">The node adapter.</param>
     /// <param name="key">The key to insert.</param>
     /// <param name="data">The data to insert.</param>
@@ -160,5 +160,34 @@ public static class RedBlackTree
 
         // Case I3
         return new(Root: root, Inserted: insertion.Inserted);
+    }
+
+    /// <summary>
+    /// Deletes a given node from a R/B tree.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    /// <typeparam name="TNodeAdapter">The node adapter type.</typeparam>
+    /// <param name="root">The root of the tree.</param>
+    /// <param name="node">The node to delete.</param>
+    /// <param name="nodeAdapter">The node adapter.</param>
+    /// <returns>The new root of the R/B tree.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static TNode? Delete<TNode, TNodeAdapter>(
+        TNode? root,
+        TNode node,
+        TNodeAdapter nodeAdapter)
+        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+                             BinarySearchTree.IParentSelector<TNode>,
+                             IColorSelector<TNode>
+    {
+        var left = nodeAdapter.GetLeftChild(node);
+        var right = nodeAdapter.GetRightChild(node);
+
+        // If we are deleting the root, which has no non-null child, just empty the tree
+        if (ReferenceEquals(root, node) && left is null &&right is null) return default;
+
+
+
+        return root;
     }
 }

@@ -145,7 +145,7 @@ public class BinarySearchTreeSet<T, TComparer> : ISet<T>
         this.Root = BinarySearchTree.Delete(
             root: this.Root,
             node: node,
-            nodeAdapter: default(NodeAdapter));
+            nodeAdapter: default(NodeAdapter)).Root;
         --this.Count;
         return true;
     }
