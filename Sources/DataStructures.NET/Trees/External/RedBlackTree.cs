@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -180,128 +181,147 @@ public static class RedBlackTree
                              BinarySearchTree.IParentSelector<TNode>,
                              IColorSelector<TNode>
     {
-        var nodeColor = nodeAdapter.GetColor(node);
+        var nodeLeft = nodeAdapter.GetLeftChild(node);
+        var nodeRight = nodeAdapter.GetRightChild(node);
 
-        // Do a BST-deletion
-        // NOTE: Same as BinarySearchTree.Delete.Shift
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void Shift(TNode u, TNode? v)
-        {
-            var uParent = nodeAdapter.GetParent(u);
-            if (uParent is null) root = v;
-            else if (ReferenceEquals(u, nodeAdapter.GetLeftChild(uParent))) nodeAdapter.SetLeftChild(uParent, v);
-            else nodeAdapter.SetRightChild(uParent, v);
-            if (v is not null) nodeAdapter.SetParent(v, uParent);
-        }
+        // If we are deleting a root that's the only element, the tree becomes empty, which is valid R/B
+        if (ReferenceEquals(root, node) && nodeLeft is null && nodeRight is null) return default;
 
-        TNode? x;
-        if (nodeAdapter.GetLeftChild(node) is null)
+        if (nodeLeft is not null && nodeRight is not null)
         {
-            // 0 or 1 child
-            x = nodeAdapter.GetRightChild(node);
-            Shift(node, x);
-        }
-        else if (nodeAdapter.GetRightChild(node) is null)
-        {
-            // 0 or 1 child
-            x = nodeAdapter.GetLeftChild(node);
-            Shift(node, x);
-        }
-        else
-        {
-            // 2 children
-            var y = BinarySearchTree.Successor(node, nodeAdapter);
-            var origNodeColor = nodeColor;
-            nodeColor = nodeAdapter.GetColor(y!);
-            x = nodeAdapter.GetRightChild(y);
-            var yParent = nodeAdapter.GetParent(y!);
-            if (!ReferenceEquals(yParent, node))
+            // Successor has at most one non-null child
+            var successor = BinarySearchTree.Successor(node, nodeAdapter)!;
+            // We swap out the two nodes
+            // Neighbors
+            var successorParent = nodeAdapter.GetParent(successor);
+            nodeAdapter.SetLeftChild(node, nodeAdapter.GetLeftChild(successor));
+            nodeAdapter.SetRightChild(node, nodeAdapter.GetRightChild(successor));
+            nodeAdapter.SetLeftChild(successor, nodeLeft);
+            nodeAdapter.SetParent(successor, nodeAdapter.GetParent(node));
+            if (ReferenceEquals(node, successorParent))
             {
-                Shift(y!, nodeAdapter.GetRightChild(y!));
-                var nodeRight = nodeAdapter.GetRightChild(node);
-                nodeAdapter.SetRightChild(y!, nodeRight);
-                if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
-            }
-            Shift(node, y);
-            var nodeLeft = nodeAdapter.GetLeftChild(node);
-            nodeAdapter.SetLeftChild(y!, nodeLeft);
-            if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
-            nodeAdapter.SetColor(y, origNodeColor);
-        }
-
-        // For non-black deletions there is nothing to do
-        if (nodeColor != Color.Black) return root;
-
-        // Otherwise we need to fix up
-        while (!ReferenceEquals(x, root) && nodeAdapter.GetColor(x) == Color.Black)
-        {
-            var xParent = nodeAdapter.GetParent(x)!;
-            var xIsLeftChild = ReferenceEquals(x, nodeAdapter.GetLeftChild(xParent));
-            var sibling = xIsLeftChild
-                ? nodeAdapter.GetRightChild(xParent)
-                : nodeAdapter.GetLeftChild(xParent);
-
-            if (nodeAdapter.GetColor(sibling!) == Color.Red)
-            {
-                // Case 3.1
-                nodeAdapter.SetColor(sibling!, Color.Black);
-                nodeAdapter.SetColor(xParent, Color.Red);
-                var rotationRoot = xIsLeftChild
-                    ? BinarySearchTree.RotateLeft(xParent, nodeAdapter)
-                    : BinarySearchTree.RotateRight(xParent, nodeAdapter);
-                if (ReferenceEquals(root, xParent)) root = rotationRoot;
-                sibling = xIsLeftChild
-                    ? nodeAdapter.GetRightChild(xParent)
-                    : nodeAdapter.GetLeftChild(xParent);
-            }
-
-            var siblingLeft = nodeAdapter.GetLeftChild(sibling!);
-            var siblingRight = nodeAdapter.GetRightChild(sibling!);
-            var siblingLeftColor = nodeAdapter.GetColor(siblingLeft!);
-            var siblingRightColor = nodeAdapter.GetColor(siblingRight!);
-            if (siblingLeftColor == Color.Black && siblingRightColor == Color.Black)
-            {
-                // Case 3.2
-                nodeAdapter.SetColor(sibling!, Color.Red);
-                x = nodeAdapter.GetParent(x);
+                nodeAdapter.SetParent(node, successor);
+                nodeAdapter.SetRightChild(successor, node);
             }
             else
             {
-                if ((xIsLeftChild && siblingRightColor == Color.Black)
-                 || (!xIsLeftChild && siblingLeftColor == Color.Black))
-                {
-                    // Case 3.3
-                    if (xIsLeftChild) nodeAdapter.SetColor(siblingLeft!, Color.Black);
-                    else nodeAdapter.SetColor(siblingRight!, Color.Black);
-
-                    nodeAdapter.SetColor(sibling!, Color.Red);
-
-                    if (xIsLeftChild) BinarySearchTree.RotateRight(sibling!, nodeAdapter);
-                    else BinarySearchTree.RotateLeft(sibling!, nodeAdapter);
-
-                    sibling = xIsLeftChild
-                        ? nodeAdapter.GetRightChild(xParent)
-                        : nodeAdapter.GetLeftChild(xParent);
-                }
-
-                // Case 3.4
-                nodeAdapter.SetColor(sibling!, nodeAdapter.GetColor(xParent));
-                nodeAdapter.SetColor(xParent, Color.Black);
-                var siblingChild = xIsLeftChild
-                    ? nodeAdapter.GetRightChild(sibling!)
-                    : nodeAdapter.GetLeftChild(sibling!);
-                nodeAdapter.SetColor(siblingChild!, Color.Black);
-                var rotationRoot = xIsLeftChild
-                    ? BinarySearchTree.RotateLeft(xParent, nodeAdapter)
-                    : BinarySearchTree.RotateRight(xParent, nodeAdapter);
-                if (ReferenceEquals(root, xParent)) root = rotationRoot;
-                x = root;
-                break;
+                nodeAdapter.SetParent(node, successorParent);
+                nodeAdapter.SetRightChild(successor, nodeRight);
             }
+            // Colors
+            var nodeColor = nodeAdapter.GetColor(node);
+            nodeAdapter.SetColor(node, nodeAdapter.GetColor(successor));
+            nodeAdapter.SetColor(successor, nodeColor);
+            // Check for root
+            if (ReferenceEquals(node, root)) root = successor;
         }
 
-        nodeAdapter.SetColor(x!, Color.Black);
+        nodeLeft = nodeAdapter.GetLeftChild(node);
+        nodeRight = nodeAdapter.GetRightChild(node);
+        var nodeParent = nodeAdapter.GetParent(node)!;
+        var nodeIsLeftChild = ReferenceEquals(nodeAdapter.GetLeftChild(nodeParent), node);
+        var child = nodeLeft ?? nodeRight;
+        if (nodeAdapter.GetColor(node) == Color.Red || child is not null)
+        {
+            // A red node must not have children here, we can simply remove
+            // If there is a child, it must be red
+            // We can simply paint that black and make it the child
+            if (nodeIsLeftChild) nodeAdapter.SetLeftChild(nodeParent, child);
+            else nodeAdapter.SetRightChild(nodeParent, child);
+            // If there was a child, we paint it black
+            if (child is not null)
+            {
+                nodeAdapter.SetParent(child, nodeParent);
+                nodeAdapter.SetColor(child, Color.Black);
+            }
+            // We are done
+            return root;
+        }
 
+        // The hard case, non-root black node and only null children
+        Debug.Assert(nodeLeft is null && nodeRight is null && nodeAdapter.GetColor(node) == Color.Black);
+
+        // Replace the parent pointer to this to null
+        if (nodeIsLeftChild) nodeAdapter.SetLeftChild(nodeParent, default);
+        else nodeAdapter.SetRightChild(nodeParent, default);
+
+        TNode? sibling, closeNephew, distantNephew;
+        TNode rotationRoot;
+        while (true)
+        {
+            sibling = nodeIsLeftChild
+                ? nodeAdapter.GetRightChild(nodeParent)
+                : nodeAdapter.GetLeftChild(nodeParent);
+            var (dn, cn) = nodeIsLeftChild
+                ? (nodeAdapter.GetRightChild(sibling!), nodeAdapter.GetLeftChild(sibling!))
+                : (nodeAdapter.GetLeftChild(sibling!), nodeAdapter.GetRightChild(sibling!));
+            distantNephew = dn;
+            closeNephew = cn;
+            if (nodeAdapter.GetColor(sibling!) == Color.Red) goto Case_D3;
+
+            // Sibling is black
+            if (distantNephew is not null && nodeAdapter.GetColor(distantNephew) == Color.Red) goto Case_D6;
+            if (closeNephew is not null && nodeAdapter.GetColor(closeNephew) == Color.Red) goto Case_D5;
+
+            // Both nephews are null
+            if (nodeAdapter.GetColor(nodeParent) == Color.Red) goto Case_D4;
+
+            // Case D1 (parent, close nephew, distant nephew and sibling are black)
+            nodeAdapter.SetColor(sibling!, Color.Red);
+
+            // Update for next iteration level
+            node = nodeParent;
+            nodeParent = nodeAdapter.GetParent(node);
+            if (nodeParent is null) break;
+            nodeIsLeftChild = ReferenceEquals(nodeAdapter.GetLeftChild(nodeParent), node);
+        }
+
+        // Delete case 2
+        return root;
+
+    Case_D3: // Sibling is red, parent, close- and distant nephew are black
+        rotationRoot = nodeIsLeftChild
+            ? BinarySearchTree.RotateLeft(nodeParent, nodeAdapter)
+            : BinarySearchTree.RotateRight(nodeParent, nodeAdapter);
+        if (ReferenceEquals(root, nodeParent)) root = rotationRoot;
+        nodeAdapter.SetColor(nodeParent, Color.Red);
+        nodeAdapter.SetColor(sibling!, Color.Black);
+        sibling = closeNephew;
+
+        // Parent is red, sibling is black
+        distantNephew = nodeIsLeftChild
+            ? nodeAdapter.GetRightChild(sibling!)
+            : nodeAdapter.GetLeftChild(sibling!);
+        if (distantNephew is not null && nodeAdapter.GetColor(distantNephew) == Color.Red) goto Case_D6;
+
+        closeNephew = nodeIsLeftChild
+            ? nodeAdapter.GetLeftChild(sibling!)
+            : nodeAdapter.GetRightChild(sibling!);
+        if (closeNephew is not null && nodeAdapter.GetColor(closeNephew) == Color.Red) goto Case_D5;
+
+        // Close and distant nephew are black
+    Case_D4:
+        nodeAdapter.SetColor(sibling!, Color.Red);
+        nodeAdapter.SetColor(nodeParent, Color.Black);
+        return root;
+
+    Case_D5:
+        // Sibling can't be the root
+        if (nodeIsLeftChild) BinarySearchTree.RotateRight(sibling!, nodeAdapter);
+        else BinarySearchTree.RotateLeft(sibling!, nodeAdapter);
+        nodeAdapter.SetColor(sibling!, Color.Red);
+        nodeAdapter.SetColor(closeNephew!, Color.Black);
+        distantNephew = sibling;
+        sibling = closeNephew;
+
+    Case_D6:
+        rotationRoot = nodeIsLeftChild
+            ? BinarySearchTree.RotateLeft(nodeParent, nodeAdapter)
+            : BinarySearchTree.RotateRight(nodeParent, nodeAdapter);
+        if (ReferenceEquals(root, nodeParent)) root = rotationRoot;
+        nodeAdapter.SetColor(sibling!, nodeAdapter.GetColor(nodeParent));
+        nodeAdapter.SetColor(nodeParent, Color.Black);
+        nodeAdapter.SetColor(distantNephew!, Color.Black);
         return root;
     }
 }
