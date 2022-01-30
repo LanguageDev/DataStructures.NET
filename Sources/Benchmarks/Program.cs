@@ -1,6 +1,6 @@
+using System.Reflection;
 using BenchmarkDotNet.Running;
 using Benchmarks.Trees;
 
 // CodegenBenchmarkRunner.Run<BinarySearchTreeCodegenBenchmarks>();
-BenchmarkRunner.Run<AvlTreeInsertBenchmarks>();
-BenchmarkRunner.Run<AvlTreeDeleteBenchmarks>();
+BenchmarkRunner.Run(Assembly.GetExecutingAssembly());

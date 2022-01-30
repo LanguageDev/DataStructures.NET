@@ -12,7 +12,7 @@ using Towel;
 namespace Benchmarks.Trees;
 
 [MemoryDiagnoser]
-public class AvlTreeInsertBenchmarks
+public class RedBlackTreeInsertBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>, Towel.IFunc<int, int, Towel.CompareResult>
     {
@@ -33,9 +33,9 @@ public class AvlTreeInsertBenchmarks
 
     private readonly List<int> numbers = new();
 
-    private readonly AvlTreeSet<int, IntComparer> avlSet = new(default);
-    private readonly AvlTreeSet<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
-    private readonly Towel.DataStructures.AvlTreeLinked<int, IntComparer> towelSet = new();
+    private readonly RedBlackTreeSet<int, IntComparer> rbSet = new(default);
+    private readonly RedBlackTreeSet<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
+    private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -47,21 +47,21 @@ public class AvlTreeInsertBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        this.avlSet.Clear();
-        this.avlSetIComparer.Clear();
+        this.rbSet.Clear();
+        this.rbSetIComparer.Clear();
         this.towelSet.Clear();
     }
     
     [Benchmark]
     public void DataStructuresNET()
     {
-        foreach (var item in this.numbers) this.avlSet.Add(item);
+        foreach (var item in this.numbers) this.rbSet.Add(item);
     }
 
     [Benchmark]
     public void DataStructuresNET_IComparer()
     {
-        foreach (var item in this.numbers) this.avlSetIComparer.Add(item);
+        foreach (var item in this.numbers) this.rbSetIComparer.Add(item);
     }
 
     [Benchmark]
@@ -72,7 +72,7 @@ public class AvlTreeInsertBenchmarks
 }
 
 [MemoryDiagnoser]
-public class AvlTreeDeleteBenchmarks
+public class RedBlackTreeDeleteBenchmarks
 {
     private readonly struct IntComparer : IComparer<int>, Towel.IFunc<int, int, Towel.CompareResult>
     {
@@ -94,9 +94,9 @@ public class AvlTreeDeleteBenchmarks
     private readonly List<int> numbersToAdd = new();
     private readonly List<int> numbersToRemove = new();
 
-    private readonly AvlTreeSet<int, IntComparer> avlSet = new(default);
-    private readonly AvlTreeSet<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
-    private readonly Towel.DataStructures.AvlTreeLinked<int, IntComparer> towelSet = new();
+    private readonly RedBlackTreeSet<int, IntComparer> rbSet = new(default);
+    private readonly RedBlackTreeSet<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
+    private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -112,14 +112,14 @@ public class AvlTreeDeleteBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        this.avlSet.Clear();
-        this.avlSetIComparer.Clear();
+        this.rbSet.Clear();
+        this.rbSetIComparer.Clear();
         this.towelSet.Clear();
 
         foreach (var item in this.numbersToAdd)
         {
-            this.avlSet.Add(item);
-            this.avlSetIComparer.Add(item);
+            this.rbSet.Add(item);
+            this.rbSetIComparer.Add(item);
             this.towelSet.TryAdd(item);
         }
     }
@@ -127,13 +127,13 @@ public class AvlTreeDeleteBenchmarks
     [Benchmark]
     public void DataStructuresNET()
     {
-        foreach (var item in this.numbersToRemove) this.avlSet.Remove(item);
+        foreach (var item in this.numbersToRemove) this.rbSet.Remove(item);
     }
 
     [Benchmark]
     public void DataStructuresNET_IComparer()
     {
-        foreach (var item in this.numbersToRemove) this.avlSetIComparer.Remove(item);
+        foreach (var item in this.numbersToRemove) this.rbSetIComparer.Remove(item);
     }
 
     [Benchmark]
