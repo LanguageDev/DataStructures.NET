@@ -6,34 +6,34 @@ using System;
 using System.Collections.Generic;
 using Fuzzer;
 using Xunit;
-using AvlTreeSet = DataStructures.NET.Trees.Linked.AvlTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using AvlTreeSetLinked = DataStructures.NET.Trees.Linked.AvlTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
 
 namespace Tests.Trees;
 
 public class AvlTreeTests
 {
-    private static void ValidateTree(AvlTreeSet.Node? root)
+    private static void ValidateTree(AvlTreeSetLinked.Node? root)
     {
-        TreeValidation.ValidateAdjacency(root, default(AvlTreeSet.NodeAdapter));
-        TreeValidation.ValidateBalanceAndHeight(root, default(AvlTreeSet.NodeAdapter));
+        TreeValidation.ValidateAdjacency(root, default(AvlTreeSetLinked.NodeAdapter));
+        TreeValidation.ValidateBalanceAndHeight(root, default(AvlTreeSetLinked.NodeAdapter));
     }
 
-    private static void ValidateTree(AvlTreeSet set) => ValidateTree(set.Root);
+    private static void ValidateTree(AvlTreeSetLinked set) => ValidateTree(set.Root);
 
     private static void AssertTreeEquals(
-        AvlTreeSet.Node? root1,
-        AvlTreeSet.Node? root2) => TreeValidation.AssertTreeEquals(
+        AvlTreeSetLinked.Node? root1,
+        AvlTreeSetLinked.Node? root2) => TreeValidation.AssertTreeEquals(
             root1: root1,
             root2: root2,
-            nodeAdapter: default(AvlTreeSet.NodeAdapter),
+            nodeAdapter: default(AvlTreeSetLinked.NodeAdapter),
             nodeEquals: (n1, n2) => n1.Key == n2.Key
                                  && n1.Height == n2.Height);
 
     private static void AssertTreeEquals(
-        AvlTreeSet set,
-        AvlTreeSet.Node? node) => AssertTreeEquals(set.Root, node);
+        AvlTreeSetLinked set,
+        AvlTreeSetLinked.Node? node) => AssertTreeEquals(set.Root, node);
 
-    private static AvlTreeSet.Node? SetParentAndHeight(AvlTreeSet.Node? root)
+    private static AvlTreeSetLinked.Node? SetParentAndHeight(AvlTreeSetLinked.Node? root)
     {
         if (root is null) return root;
         if (root.Left is not null)
@@ -50,12 +50,12 @@ public class AvlTreeTests
         return root;
     }
 
-    private static AvlTreeSet.Node InsertCase1Root => SetParentAndHeight(new(20)
+    private static AvlTreeSetLinked.Node InsertCase1Root => SetParentAndHeight(new(20)
     {
         Left = new(4),
     })!;
 
-    private static AvlTreeSet.Node InsertCase2Root => SetParentAndHeight(new(20)
+    private static AvlTreeSetLinked.Node InsertCase2Root => SetParentAndHeight(new(20)
     {
         Left = new(4)
         {
@@ -65,7 +65,7 @@ public class AvlTreeTests
         Right = new(26),
     })!;
 
-    private static AvlTreeSet.Node InsertCase3Root => SetParentAndHeight(new(20)
+    private static AvlTreeSetLinked.Node InsertCase3Root => SetParentAndHeight(new(20)
     {
         Left = new(4)
         {

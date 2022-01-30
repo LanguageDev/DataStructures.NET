@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataStructures.NET.Trees.Linked;
-using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
-using AvlTreeSet = DataStructures.NET.Trees.Linked.AvlTreeSet<int, System.Collections.Generic.IComparer<int>>;
-using RedBlackTreeSet = DataStructures.NET.Trees.Linked.RedBlackTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
+using AvlTreeSetLinked = DataStructures.NET.Trees.Linked.AvlTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
+using RedBlackTreeSetLinked = DataStructures.NET.Trees.Linked.RedBlackTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
 
 namespace Fuzzer;
 
@@ -30,36 +30,36 @@ internal class SetFuzzer
         }
     }
 
-    private class AvlTreeValidator : IValidator<AvlTreeSet, ISet<int>>
+    private class AvlTreeValidator : IValidator<AvlTreeSetLinked, ISet<int>>
     {
         public static AvlTreeValidator Instance { get; } = new();
 
-        public string ToTestCase(AvlTreeSet tested) =>
-            TreeValidation.ToTestCaseString(tested.Root, default(AvlTreeSet.NodeAdapter), n => n.Key.ToString());
+        public string ToTestCase(AvlTreeSetLinked tested) =>
+            TreeValidation.ToTestCaseString(tested.Root, default(AvlTreeSetLinked.NodeAdapter), n => n.Key.ToString());
 
-        public void Validate(AvlTreeSet tested, ISet<int> oracle)
+        public void Validate(AvlTreeSetLinked tested, ISet<int> oracle)
         {
-            TreeValidation.ValidateAdjacency(tested.Root, default(AvlTreeSet.NodeAdapter));
-            TreeValidation.ValidateData(tested.Root, default(AvlTreeSet.NodeAdapter), n => n.Key, oracle);
-            TreeValidation.ValidateBalanceAndHeight(tested.Root, default(AvlTreeSet.NodeAdapter));
+            TreeValidation.ValidateAdjacency(tested.Root, default(AvlTreeSetLinked.NodeAdapter));
+            TreeValidation.ValidateData(tested.Root, default(AvlTreeSetLinked.NodeAdapter), n => n.Key, oracle);
+            TreeValidation.ValidateBalanceAndHeight(tested.Root, default(AvlTreeSetLinked.NodeAdapter));
         }
     }
 
-    private class RedBlackTreeValidator : IValidator<RedBlackTreeSet, ISet<int>>
+    private class RedBlackTreeValidator : IValidator<RedBlackTreeSetLinked, ISet<int>>
     {
         public static RedBlackTreeValidator Instance { get; } = new();
 
-        public string ToTestCase(RedBlackTreeSet tested) =>
+        public string ToTestCase(RedBlackTreeSetLinked tested) =>
             TreeValidation.ToTestCaseString(
                 tested.Root,
-                default(RedBlackTreeSet.NodeAdapter),
+                default(RedBlackTreeSetLinked.NodeAdapter),
                 n => $"{n.Key}, {n.Color}");
 
-        public void Validate(RedBlackTreeSet tested, ISet<int> oracle)
+        public void Validate(RedBlackTreeSetLinked tested, ISet<int> oracle)
         {
-            TreeValidation.ValidateAdjacency(tested.Root, default(RedBlackTreeSet.NodeAdapter));
-            TreeValidation.ValidateData(tested.Root, default(RedBlackTreeSet.NodeAdapter), n => n.Key, oracle);
-            TreeValidation.ValidateRedBlack(tested.Root, default(RedBlackTreeSet.NodeAdapter));
+            TreeValidation.ValidateAdjacency(tested.Root, default(RedBlackTreeSetLinked.NodeAdapter));
+            TreeValidation.ValidateData(tested.Root, default(RedBlackTreeSetLinked.NodeAdapter), n => n.Key, oracle);
+            TreeValidation.ValidateRedBlack(tested.Root, default(RedBlackTreeSetLinked.NodeAdapter));
         }
     }
 

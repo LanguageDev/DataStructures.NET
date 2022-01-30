@@ -6,35 +6,35 @@ using System;
 using System.Collections.Generic;
 using Fuzzer;
 using Xunit;
-using RedBlackTreeSet = DataStructures.NET.Trees.Linked.RedBlackTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using RedBlackTreeSetLinked = DataStructures.NET.Trees.Linked.RedBlackTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
 using Color = DataStructures.NET.Trees.External.RedBlackTree.Color;
 
 namespace Tests.Trees;
 
 public class RedBlackTreeTests
 {
-    private static void ValidateTree(RedBlackTreeSet.Node? root)
+    private static void ValidateTree(RedBlackTreeSetLinked.Node? root)
     {
-        TreeValidation.ValidateAdjacency(root, default(RedBlackTreeSet.NodeAdapter));
-        TreeValidation.ValidateRedBlack(root, default(RedBlackTreeSet.NodeAdapter));
+        TreeValidation.ValidateAdjacency(root, default(RedBlackTreeSetLinked.NodeAdapter));
+        TreeValidation.ValidateRedBlack(root, default(RedBlackTreeSetLinked.NodeAdapter));
     }
 
-    private static void ValidateTree(RedBlackTreeSet set) => ValidateTree(set.Root);
+    private static void ValidateTree(RedBlackTreeSetLinked set) => ValidateTree(set.Root);
 
     private static void AssertTreeEquals(
-        RedBlackTreeSet.Node? root1,
-        RedBlackTreeSet.Node? root2) => TreeValidation.AssertTreeEquals(
+        RedBlackTreeSetLinked.Node? root1,
+        RedBlackTreeSetLinked.Node? root2) => TreeValidation.AssertTreeEquals(
             root1: root1,
             root2: root2,
-            nodeAdapter: default(RedBlackTreeSet.NodeAdapter),
+            nodeAdapter: default(RedBlackTreeSetLinked.NodeAdapter),
             nodeEquals: (n1, n2) => n1.Key == n2.Key
                                  && n1.Color == n2.Color);
 
     private static void AssertTreeEquals(
-        RedBlackTreeSet set,
-        RedBlackTreeSet.Node? node) => AssertTreeEquals(set.Root, node);
+        RedBlackTreeSetLinked set,
+        RedBlackTreeSetLinked.Node? node) => AssertTreeEquals(set.Root, node);
 
-    private static RedBlackTreeSet.Node? SetParent(RedBlackTreeSet.Node? root)
+    private static RedBlackTreeSetLinked.Node? SetParent(RedBlackTreeSetLinked.Node? root)
     {
         if (root is null) return root;
         if (root.Left is not null)

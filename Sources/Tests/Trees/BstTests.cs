@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 using Fuzzer;
-using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSetLinked<int, System.Collections.Generic.IComparer<int>>;
 using DataStructures.NET.Trees.External;
 
 namespace Tests.Trees;

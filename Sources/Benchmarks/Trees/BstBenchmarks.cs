@@ -24,8 +24,8 @@ public class BstInsertBenchmarks
 
     private readonly List<int> numbers = new();
 
-    private readonly BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
-    private readonly BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSet = new(default);
+    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
     private readonly BinaryTree.BinaryTree<int> marusykSet = new();
     private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
@@ -84,8 +84,8 @@ public class BstDeleteBenchmarks
     private readonly List<int> numbersToAdd = new();
     private readonly List<int> numbersToRemove = new();
 
-    private readonly BinarySearchTreeSet<int, IntComparer> dsnSet = new(default);
-    private readonly BinarySearchTreeSet<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSet = new(default);
+    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
     private readonly BinaryTree.BinaryTree<int> marusykSet = new();
     private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 

@@ -33,8 +33,8 @@ public class AvlTreeInsertBenchmarks
 
     private readonly List<int> numbers = new();
 
-    private readonly AvlTreeSet<int, IntComparer> avlSet = new(default);
-    private readonly AvlTreeSet<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
+    private readonly AvlTreeSetLinked<int, IntComparer> avlSet = new(default);
+    private readonly AvlTreeSetLinked<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.AvlTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]
@@ -94,8 +94,8 @@ public class AvlTreeDeleteBenchmarks
     private readonly List<int> numbersToAdd = new();
     private readonly List<int> numbersToRemove = new();
 
-    private readonly AvlTreeSet<int, IntComparer> avlSet = new(default);
-    private readonly AvlTreeSet<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
+    private readonly AvlTreeSetLinked<int, IntComparer> avlSet = new(default);
+    private readonly AvlTreeSetLinked<int, IComparer<int>> avlSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.AvlTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]

@@ -17,7 +17,7 @@ namespace DataStructures.NET.Trees.Linked;
 /// </summary>
 /// <typeparam name="T">The stored element type.</typeparam>
 /// <typeparam name="TComparer">The comparer type.</typeparam>
-public class BinarySearchTreeSet<T, TComparer> : ISet<T>
+public class BinarySearchTreeSetLinked<T, TComparer> : ISet<T>
     where TComparer : IComparer<T>
 {
     /// <summary>
@@ -103,7 +103,7 @@ public class BinarySearchTreeSet<T, TComparer> : ISet<T>
     /// Initializes a new, empty BST-based set.
     /// </summary>
     /// <param name="comparer"></param>
-    public BinarySearchTreeSet(TComparer comparer)
+    public BinarySearchTreeSetLinked(TComparer comparer)
     {
         this.comparer = comparer;
     }

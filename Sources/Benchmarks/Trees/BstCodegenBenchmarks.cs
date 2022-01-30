@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using CodegenAnalysis;
 using CodegenAnalysis.Benchmarks;
 using DataStructures.NET.Trees.External;
-using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, Benchmarks.Trees.BstCodegenBenchmarks.IntComparer>;
+using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSetLinked<int, Benchmarks.Trees.BstCodegenBenchmarks.IntComparer>;
 
 namespace Benchmarks.Trees;
 

@@ -13,11 +13,11 @@ namespace DataStructures.NET.Trees.Linked;
 // TODO: Finish implementation
 
 /// <summary>
-/// A reference set implementation based on a Red-Black tree.
+/// A reference set implementation based on an AVL tree.
 /// </summary>
 /// <typeparam name="T">The stored element type.</typeparam>
 /// <typeparam name="TComparer">The comparer type.</typeparam>
-public class RedBlackTreeSet<T, TComparer> : ISet<T>
+public class AvlTreeSetLinked<T, TComparer> : ISet<T>
     where TComparer : IComparer<T>
 {
     /// <summary>
@@ -31,9 +31,9 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
         public T Key { get; }
 
         /// <summary>
-        /// The color of this node.
+        /// The height of this node.
         /// </summary>
-        public RedBlackTree.Color Color { get; set; }
+        public int Height { get; set; } = 1;
 
         /// <summary>
         /// The parent of this node.
@@ -63,7 +63,7 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
     internal readonly struct NodeAdapter :
         BinarySearchTree.IChildSelector<Node>,
         BinarySearchTree.IParentSelector<Node>,
-        RedBlackTree.IColorSelector<Node>,
+        AvlTree.IHeightSelector<Node>,
         BinarySearchTree.IKeySelector<Node, T>,
         BinarySearchTree.INodeBuilder<T, bool, Node>
     {
@@ -92,10 +92,10 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
         public Node Build(T key, bool data) => new(key);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RedBlackTree.Color GetColor(Node node) => node.Color;
+        public int GetHeight(Node node) => node.Height;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetColor(Node node, RedBlackTree.Color color) => node.Color = color;
+        public void SetHeight(Node node, int height) => node.Height = height;
     }
 
     /// <inheritdoc/>
@@ -115,7 +115,7 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
     /// Initializes a new, empty BST-based set.
     /// </summary>
     /// <param name="comparer"></param>
-    public RedBlackTreeSet(TComparer comparer)
+    public AvlTreeSetLinked(TComparer comparer)
     {
         this.comparer = comparer;
     }
@@ -130,7 +130,7 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
     /// <inheritdoc/>
     public bool Add(T element)
     {
-        var insert = RedBlackTree.Insert(
+        var insert = AvlTree.Insert(
             root: this.Root,
             nodeAdapter: default(NodeAdapter),
             key: element,
@@ -154,7 +154,7 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
             key: element,
             keyComparer: this.comparer).Found;
         if (node is null) return false;
-        this.Root = RedBlackTree.Delete(
+        this.Root = AvlTree.Delete(
             root: this.Root,
             node: node,
             nodeAdapter: default(NodeAdapter));

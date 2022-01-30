@@ -33,8 +33,8 @@ public class RedBlackTreeInsertBenchmarks
 
     private readonly List<int> numbers = new();
 
-    private readonly RedBlackTreeSet<int, IntComparer> rbSet = new(default);
-    private readonly RedBlackTreeSet<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
+    private readonly RedBlackTreeSetLinked<int, IntComparer> rbSet = new(default);
+    private readonly RedBlackTreeSetLinked<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]
@@ -94,8 +94,8 @@ public class RedBlackTreeDeleteBenchmarks
     private readonly List<int> numbersToAdd = new();
     private readonly List<int> numbersToRemove = new();
 
-    private readonly RedBlackTreeSet<int, IntComparer> rbSet = new(default);
-    private readonly RedBlackTreeSet<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
+    private readonly RedBlackTreeSetLinked<int, IntComparer> rbSet = new(default);
+    private readonly RedBlackTreeSetLinked<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
 
     [GlobalSetup]
