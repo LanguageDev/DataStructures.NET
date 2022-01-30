@@ -183,21 +183,34 @@ public static class RedBlackTree
     {
         var nodeLeft = nodeAdapter.GetLeftChild(node);
         var nodeRight = nodeAdapter.GetRightChild(node);
+        var nodeParent = nodeAdapter.GetParent(node);
 
         // If we are deleting a root that's the only element, the tree becomes empty, which is valid R/B
         if (ReferenceEquals(root, node) && nodeLeft is null && nodeRight is null) return default;
 
         if (nodeLeft is not null && nodeRight is not null)
         {
+            // TODO: There has to be a nicer way...
             // Successor has at most one non-null child
             var successor = BinarySearchTree.Successor(node, nodeAdapter)!;
             // We swap out the two nodes
             // Neighbors
+            var successorLeft = nodeAdapter.GetLeftChild(successor);
+            var successorRight = nodeAdapter.GetRightChild(successor);
             var successorParent = nodeAdapter.GetParent(successor);
-            nodeAdapter.SetLeftChild(node, nodeAdapter.GetLeftChild(successor));
-            nodeAdapter.SetRightChild(node, nodeAdapter.GetRightChild(successor));
+            nodeAdapter.SetLeftChild(node, successorLeft);
+            if (successorLeft is not null) nodeAdapter.SetParent(successorLeft, node);
+            nodeAdapter.SetRightChild(node, successorRight);
+            if (successorRight is not null) nodeAdapter.SetParent(successorRight, node);
             nodeAdapter.SetLeftChild(successor, nodeLeft);
-            nodeAdapter.SetParent(successor, nodeAdapter.GetParent(node));
+            if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, successor);
+            nodeAdapter.SetParent(successor, nodeParent);
+            if (nodeParent is not null)
+            {
+                var nodeParentLeft = nodeAdapter.GetLeftChild(nodeParent);
+                if (ReferenceEquals(nodeParentLeft, node)) nodeAdapter.SetLeftChild(nodeParent, successor);
+                else nodeAdapter.SetRightChild(nodeParent, successor);
+            }
             if (ReferenceEquals(node, successorParent))
             {
                 nodeAdapter.SetParent(node, successor);
@@ -206,7 +219,14 @@ public static class RedBlackTree
             else
             {
                 nodeAdapter.SetParent(node, successorParent);
+                if (successorParent is not null)
+                {
+                    var successorParentLeft = nodeAdapter.GetLeftChild(successorParent);
+                    if (ReferenceEquals(successorParentLeft, successor)) nodeAdapter.SetLeftChild(successorParent, node);
+                    else nodeAdapter.SetRightChild(successorParent, node);
+                }
                 nodeAdapter.SetRightChild(successor, nodeRight);
+                if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, successor);
             }
             // Colors
             var nodeColor = nodeAdapter.GetColor(node);
@@ -218,16 +238,24 @@ public static class RedBlackTree
 
         nodeLeft = nodeAdapter.GetLeftChild(node);
         nodeRight = nodeAdapter.GetRightChild(node);
-        var nodeParent = nodeAdapter.GetParent(node)!;
-        var nodeIsLeftChild = ReferenceEquals(nodeAdapter.GetLeftChild(nodeParent), node);
+        nodeParent = nodeAdapter.GetParent(node)!;
         var child = nodeLeft ?? nodeRight;
+        bool nodeIsLeftChild;
         if (nodeAdapter.GetColor(node) == Color.Red || child is not null)
         {
             // A red node must not have children here, we can simply remove
             // If there is a child, it must be red
             // We can simply paint that black and make it the child
-            if (nodeIsLeftChild) nodeAdapter.SetLeftChild(nodeParent, child);
-            else nodeAdapter.SetRightChild(nodeParent, child);
+            if (nodeParent is not null)
+            {
+                nodeIsLeftChild = ReferenceEquals(nodeAdapter.GetLeftChild(nodeParent), node);
+                if (nodeIsLeftChild) nodeAdapter.SetLeftChild(nodeParent, child);
+                else nodeAdapter.SetRightChild(nodeParent, child);
+            }
+            else
+            {
+                root = child;
+            }
             // If there was a child, we paint it black
             if (child is not null)
             {
@@ -242,6 +270,7 @@ public static class RedBlackTree
         Debug.Assert(nodeLeft is null && nodeRight is null && nodeAdapter.GetColor(node) == Color.Black);
 
         // Replace the parent pointer to this to null
+        nodeIsLeftChild = ReferenceEquals(nodeAdapter.GetLeftChild(nodeParent), node);
         if (nodeIsLeftChild) nodeAdapter.SetLeftChild(nodeParent, default);
         else nodeAdapter.SetRightChild(nodeParent, default);
 

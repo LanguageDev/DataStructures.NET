@@ -324,4 +324,23 @@ public class RedBlackTreeTests
                 Left = new(1) { Color = Color.Red },
             }));
     }
+
+    [Fact]
+    public void Delete2From21()
+    {
+        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        {
+            Root = SetParent(new(2)
+            {
+                Color = Color.Black,
+                Left = new(1) { Color = Color.Red },
+            })
+        };
+        ValidateTree(set);
+        Assert.True(set.Remove(2));
+        ValidateTree(set);
+        AssertTreeEquals(
+            set,
+            SetParent(new(1) { Color = Color.Black }));
+    }
 }

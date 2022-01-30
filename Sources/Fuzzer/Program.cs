@@ -11,7 +11,7 @@ internal class Program
     {
         try
         {
-            SetFuzzer.FuzzRedBlackTree(4);
+            SetFuzzer.FuzzRedBlackTree(100);
         }
         catch (FuzzerException f)
         {
