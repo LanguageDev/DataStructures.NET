@@ -50,7 +50,10 @@ internal class SetFuzzer
         public static RedBlackTreeValidator Instance { get; } = new();
 
         public string ToTestCase(RedBlackTreeSet tested) =>
-            TreeValidation.ToTestCaseString(tested.Root, default(RedBlackTreeSet.NodeAdapter), n => n.Key.ToString());
+            TreeValidation.ToTestCaseString(
+                tested.Root,
+                default(RedBlackTreeSet.NodeAdapter),
+                n => $"{n.Key}, {n.Color}");
 
         public void Validate(RedBlackTreeSet tested, ISet<int> oracle)
         {
@@ -86,7 +89,7 @@ internal class SetFuzzer
             {
                 validator.Validate(tested, oracle);
             }
-            catch (ValidationException v)
+            catch (Exception v)
             {
                 throw new FuzzerException(v, "<empty>", "ctor");
             }
@@ -123,7 +126,7 @@ internal class SetFuzzer
                 {
                     validator.Validate(tested, oracle);
                 }
-                catch (ValidationException v)
+                catch (Exception v)
                 {
                     throw new FuzzerException(v, testCase, operation);
                 }

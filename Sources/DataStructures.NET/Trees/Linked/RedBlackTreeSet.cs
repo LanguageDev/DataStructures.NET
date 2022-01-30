@@ -148,8 +148,6 @@ public class RedBlackTreeSet<T, TComparer> : ISet<T>
     /// <inheritdoc/>
     public bool Remove(T element)
     {
-        throw new NotImplementedException();
-
         var node = BinarySearchTree.Search(
             root: this.Root,
             nodeAdapter: default(NodeAdapter),

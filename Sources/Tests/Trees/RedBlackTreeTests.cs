@@ -271,4 +271,57 @@ public class RedBlackTreeTests
                 },
             }));
     }
+
+    [Fact]
+    public void Delete5From5267()
+    {
+        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        {
+            Root = SetParent(new(5)
+            {
+                Color = Color.Red,
+                Left = new(2) { Color = Color.Black },
+                Right = new(6)
+                {
+                    Color = Color.Black,
+                    Right = new(7) { Color = Color.Red },
+                },
+            })
+        };
+        ValidateTree(set);
+        Assert.True(set.Remove(5));
+        ValidateTree(set);
+        AssertTreeEquals(
+            set,
+            SetParent(new(6)
+            {
+                Color = Color.Red,
+                Left = new(2) { Color = Color.Black },
+                Right = new(7) { Color = Color.Black },
+            }));
+    }
+
+    [Fact]
+    public void Delete7From1413()
+    {
+        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        {
+            Root = SetParent(new(4)
+            {
+                Color = Color.Red,
+                Left = new(1) { Color = Color.Black },
+                Right = new(7) { Color = Color.Black },
+            })
+        };
+        ValidateTree(set);
+        Assert.True(set.Remove(7));
+        ValidateTree(set);
+        AssertTreeEquals(
+            set,
+            SetParent(new(4)
+            {
+                Color = Color.Black,
+                Left = new(1) { Color = Color.Red },
+            }));
+    }
 }

@@ -8,8 +8,8 @@ namespace Fuzzer;
 
 internal class FuzzerException : Exception
 {
-    public FuzzerException(ValidationException validationException, string testCase, string operation)
-        : this(validationException.Message, testCase, operation)
+    public FuzzerException(Exception exception, string testCase, string operation)
+        : this(exception.Message, testCase, operation)
     {
     }
 
