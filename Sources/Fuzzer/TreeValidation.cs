@@ -151,6 +151,39 @@ public static class TreeValidation
         if (rootExpHeight != rootActHeight) throw new ValidationException($"Height error: The root's height ({rootActHeight}) does not match the expected ({rootExpHeight})");
     }
 
+    public static void ValidateRedBlack<TNode, TNodeAdapter>(
+        TNode? root,
+        TNodeAdapter nodeAdapter)
+        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+                             RedBlackTree.IColorSelector<TNode>
+    {
+        // NOTE: Returns black height
+        int Impl(TNode? node)
+        {
+            // Consider NIL as a black node
+            if (node is null) return 1;
+
+            var left = nodeAdapter.GetLeftChild(node);
+            var right = nodeAdapter.GetRightChild(node);
+
+            if (nodeAdapter.GetColor(node) == RedBlackTree.Color.Red)
+            {
+                // Can not have red children
+                if (left is not null && nodeAdapter.GetColor(left) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Left child of a red node is red");
+                if (right is not null && nodeAdapter.GetColor(right) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Right child of a red node is red");
+            }
+
+            var leftBlackHeight = Impl(left);
+            var rightBlackHeight = Impl(right);
+
+            if (leftBlackHeight != rightBlackHeight) throw new ValidationException($"Black height error: The black heights ({leftBlackHeight} vs {rightBlackHeight}) differ");
+
+            return leftBlackHeight;
+        }
+
+        Impl(root);
+    }
+
     public static void AssertTreeEquals<TNode, TNodeAdapter>(
         TNode? root1,
         TNode? root2,

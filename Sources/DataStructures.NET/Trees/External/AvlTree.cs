@@ -167,12 +167,12 @@ public static class AvlTree
     }
 
     /// <summary>
-    /// Performs an insertion on an AVL tre.
+    /// Performs an insertion on an AVL tree.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
     /// <typeparam name="TNodeAdapter">The node adapter type.</typeparam>
-    /// <typeparam name="TData">The inserted data type.</typeparam>
     /// <typeparam name="TKey">The key type.</typeparam>
+    /// <typeparam name="TData">The inserted data type.</typeparam>
     /// <typeparam name="TKeyComparer">The key comparer type.</typeparam>
     /// <param name="root">The root of the AVL tree.</param>
     /// <param name="nodeAdapter">The node adapter.</param>
@@ -181,7 +181,7 @@ public static class AvlTree
     /// <param name="keyComparer">The key comparer.</param>
     /// <returns>The results of the insertion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BinarySearchTree.InsertResult<TNode> Insert<TNode, TNodeAdapter, TData, TKey, TKeyComparer>(
+    public static BinarySearchTree.InsertResult<TNode> Insert<TNode, TNodeAdapter, TKey, TData, TKeyComparer>(
         TNode? root,
         TNodeAdapter nodeAdapter,
         TKey key,

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using DataStructures.NET.Trees.Linked;
 using BstSet = DataStructures.NET.Trees.Linked.BinarySearchTreeSet<int, System.Collections.Generic.IComparer<int>>;
 using AvlTreeSet = DataStructures.NET.Trees.Linked.AvlTreeSet<int, System.Collections.Generic.IComparer<int>>;
+using RedBlackTreeSet = DataStructures.NET.Trees.Linked.RedBlackTreeSet<int, System.Collections.Generic.IComparer<int>>;
 
 namespace Fuzzer;
 
@@ -44,11 +45,29 @@ internal class SetFuzzer
         }
     }
 
+    private class RedBlackTreeValidator : IValidator<RedBlackTreeSet, ISet<int>>
+    {
+        public static RedBlackTreeValidator Instance { get; } = new();
+
+        public string ToTestCase(RedBlackTreeSet tested) =>
+            TreeValidation.ToTestCaseString(tested.Root, default(RedBlackTreeSet.NodeAdapter), n => n.Key.ToString());
+
+        public void Validate(RedBlackTreeSet tested, ISet<int> oracle)
+        {
+            TreeValidation.ValidateAdjacency(tested.Root, default(RedBlackTreeSet.NodeAdapter));
+            TreeValidation.ValidateData(tested.Root, default(RedBlackTreeSet.NodeAdapter), n => n.Key, oracle);
+            TreeValidation.ValidateRedBlack(tested.Root, default(RedBlackTreeSet.NodeAdapter));
+        }
+    }
+
     public static void FuzzBst(int maxElements) =>
         Fuzz(maxElements, () => new BstSet(Comparer<int>.Default), BstValidator.Instance);
 
     public static void FuzzAvlTree(int maxElements) =>
         Fuzz(maxElements, () => new AvlTreeSet(Comparer<int>.Default), AvlTreeValidator.Instance);
+
+    public static void FuzzRedBlackTree(int maxElements) =>
+        Fuzz(maxElements, () => new RedBlackTreeSet(Comparer<int>.Default), RedBlackTreeValidator.Instance);
 
     public static void Fuzz<TTested>(
         int maxElements,
