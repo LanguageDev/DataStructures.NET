@@ -53,12 +53,14 @@ public static class AvlTree
     public static void UpdateHeight<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>, IHeightSelector<TNode>
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
+                             IHeightSelector<TNode>
     {
         var nodeLeft = nodeAdapter.GetLeftChild(node);
         var nodeRight = nodeAdapter.GetRightChild(node);
-        var leftHeight = nodeLeft is null ? 0 : nodeAdapter.GetHeight(nodeLeft);
-        var rightHeight = nodeRight is null ? 0 : nodeAdapter.GetHeight(nodeRight);
+        var leftHeight = nodeAdapter.IsNil(nodeLeft) ? 0 : nodeAdapter.GetHeight(nodeLeft);
+        var rightHeight = nodeAdapter.IsNil(nodeRight) ? 0 : nodeAdapter.GetHeight(nodeRight);
         nodeAdapter.SetHeight(node, Math.Max(leftHeight, rightHeight) + 1);
     }
 
@@ -75,12 +77,14 @@ public static class AvlTree
     public static int BalanceFactor<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>, IHeightSelector<TNode>
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
+                             IHeightSelector<TNode>
     {
         var left = nodeAdapter.GetLeftChild(node);
         var right = nodeAdapter.GetRightChild(node);
-        var leftHeight = left is null ? 0 : nodeAdapter.GetHeight(left);
-        var rightHeight = right is null ? 0 : nodeAdapter.GetHeight(right);
+        var leftHeight = nodeAdapter.IsNil(left) ? 0 : nodeAdapter.GetHeight(left);
+        var rightHeight = nodeAdapter.IsNil(right) ? 0 : nodeAdapter.GetHeight(right);
         return leftHeight - rightHeight;
     }
 
@@ -207,18 +211,18 @@ public static class AvlTree
             keyComparer: keyComparer);
 
         // If nothing is inserted, return here
-        if (insertion.Inserted is null) return new(Root: root!, Existing: insertion.Existing, Inserted: nodeAdapter.NilNode);
+        if (nodeAdapter.IsNil(insertion.Inserted)) return new(Root: root!, Existing: insertion.Existing, Inserted: nodeAdapter.NilNode);
 
         // There was a node inserted
         root = insertion.Root;
 
         // We start walking up the tree, updating the heights
         // If we find a node that needs rebalancing, we rebalance it, then stop
-        for (var n = insertion.Inserted; n is not null; n = nodeAdapter.GetParent(n))
+        for (var n = insertion.Inserted; nodeAdapter.IsNotNil(n); n = nodeAdapter.GetParent(n))
         {
             UpdateHeight(n, nodeAdapter);
             var rebalance = Rebalance(n, nodeAdapter);
-            if (ReferenceEquals(n, root)) root = rebalance.Root;
+            if (nodeAdapter.NodeEquals(n, root)) root = rebalance.Root;
             if (rebalance.Rebalanced) break;
             n = rebalance.Root;
         }
@@ -254,11 +258,11 @@ public static class AvlTree
         root = deletion.Root;
 
         // Rebalance upwards
-        for (var n = deletion.Parent; n is not null; n = nodeAdapter.GetParent(n!))
+        for (var n = deletion.Parent; nodeAdapter.IsNotNil(n); n = nodeAdapter.GetParent(n!))
         {
             UpdateHeight(n, nodeAdapter);
             var rebalance = Rebalance(n, nodeAdapter);
-            if (ReferenceEquals(n, root)) root = rebalance.Root;
+            if (nodeAdapter.NodeEquals(n, root)) root = rebalance.Root;
             n = rebalance.Root;
         }
 

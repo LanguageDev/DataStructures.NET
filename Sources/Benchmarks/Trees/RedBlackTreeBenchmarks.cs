@@ -36,6 +36,7 @@ public class RedBlackTreeInsertBenchmarks
     private readonly RedBlackTreeSetLinked<int, IntComparer> rbSet = new(default);
     private readonly RedBlackTreeSetLinked<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
+    private readonly SortedSet<int> bclSortedSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -50,6 +51,7 @@ public class RedBlackTreeInsertBenchmarks
         this.rbSet.Clear();
         this.rbSetIComparer.Clear();
         this.towelSet.Clear();
+        this.bclSortedSet.Clear();
     }
     
     [Benchmark]
@@ -68,6 +70,12 @@ public class RedBlackTreeInsertBenchmarks
     public void Towel()
     {
         foreach (var item in this.numbers) this.towelSet.TryAdd(item);
+    }
+
+    [Benchmark]
+    public void BclSortedSet()
+    {
+        foreach (var item in this.numbers) this.bclSortedSet.Add(item);
     }
 }
 
@@ -97,6 +105,7 @@ public class RedBlackTreeDeleteBenchmarks
     private readonly RedBlackTreeSetLinked<int, IntComparer> rbSet = new(default);
     private readonly RedBlackTreeSetLinked<int, IComparer<int>> rbSetIComparer = new(Comparer<int>.Default);
     private readonly Towel.DataStructures.RedBlackTreeLinked<int, IntComparer> towelSet = new();
+    private readonly SortedSet<int> bclSortedSet = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -115,12 +124,14 @@ public class RedBlackTreeDeleteBenchmarks
         this.rbSet.Clear();
         this.rbSetIComparer.Clear();
         this.towelSet.Clear();
+        this.bclSortedSet.Clear();
 
         foreach (var item in this.numbersToAdd)
         {
             this.rbSet.Add(item);
             this.rbSetIComparer.Add(item);
             this.towelSet.TryAdd(item);
+            this.bclSortedSet.Add(item);
         }
     }
 
@@ -140,5 +151,11 @@ public class RedBlackTreeDeleteBenchmarks
     public void Towel()
     {
         foreach (var item in this.numbersToRemove) this.towelSet.TryRemove(item);
+    }
+
+    [Benchmark]
+    public void BclSortedSet()
+    {
+        foreach (var item in this.numbersToRemove) this.bclSortedSet.Remove(item);
     }
 }
