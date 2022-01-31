@@ -53,7 +53,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert214()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default);
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default);
         ValidateTree(set);
         Assert.True(set.Add(2));
         ValidateTree(set);
@@ -74,7 +74,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert5To214()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {
@@ -103,7 +103,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert9To2145()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {
@@ -137,7 +137,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert3To21459()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {
@@ -176,7 +176,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert6To214593()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {
@@ -223,7 +223,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Insert7To2145936()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {
@@ -275,7 +275,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Delete5From5267()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(5)
             {
@@ -304,7 +304,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Delete7From1413()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(4)
             {
@@ -328,7 +328,7 @@ public class RedBlackTreeTests
     [Fact]
     public void Delete2From21()
     {
-        var set = new RedBlackTreeSet(Comparer<int>.Default)
+        var set = new RedBlackTreeSetLinked(Comparer<int>.Default)
         {
             Root = SetParent(new(2)
             {

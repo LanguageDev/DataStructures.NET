@@ -26,6 +26,26 @@ public static class BinarySearchTree
     }
 
     /// <summary>
+    /// Node identify functionality.
+    /// </summary>
+    /// <typeparam name="TNode">The node implementation type.</typeparam>
+    public interface INodeIdentity<TNode>
+    {
+        /// <summary>
+        /// The null node.
+        /// </summary>
+        public TNode? NilNode { get; }
+
+        /// <summary>
+        /// Checks, if two nodes are equal. For actual tree-nodes this usually means referential equality.
+        /// </summary>
+        /// <param name="n1">The first node to equate.</param>
+        /// <param name="n2">The second node to equate.</param>
+        /// <returns>True, if <paramref name="n1"/> and <paramref name="n2"/> are considered equal.</returns>
+        public bool NodeEquals(TNode? n1, TNode? n2);
+    }
+
+    /// <summary>
     /// Child getter and setter functionality.
     /// </summary>
     /// <typeparam name="TNode">The node implementation type.</typeparam>
@@ -120,8 +140,8 @@ public static class BinarySearchTree
     /// <param name="Found">The node found. This is the exact match, if <paramref name="Hint"/> is null.</param>
     /// <param name="Hint">The hint for insertion, if an exact match is not found.</param>
     public readonly record struct SearchResult<TNode>(
-        TNode? Found = default,
-        (TNode Node, Child Child)? Hint = null);
+        TNode? Found,
+        (TNode Node, Child Child)? Hint = null); // NOTE: Can be null, since we know this is a nullable value-type
 
     /// <summary>
     /// Represents the result of an insertion.
@@ -132,8 +152,8 @@ public static class BinarySearchTree
     /// <param name="Existing">The existing node that blocked the insertion, if any.</param>
     public readonly record struct InsertResult<TNode>(
         TNode Root,
-        TNode? Inserted = default,
-        TNode? Existing = default);
+        TNode? Inserted,
+        TNode? Existing);
 
     /// <summary>
     /// Represents the result of a deletion.
@@ -143,7 +163,7 @@ public static class BinarySearchTree
     /// <param name="Parent">The parent of the node that was removed or moved in the tree. This can be used for rebalancing.</param>
     public readonly record struct DeleteResult<TNode>(
         TNode? Root,
-        TNode? Parent = default);
+        TNode? Parent);
 
     /// <summary>
     /// Retrieves the minimum (leftmost leaf) of a given subtree.
@@ -157,12 +177,12 @@ public static class BinarySearchTree
     public static TNode Minimum<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>
     {
         while (true)
         {
             var left = nodeAdapter.GetLeftChild(root);
-            if (left is null) break;
+            if (nodeAdapter.IsNil(left)) break;
             root = left;
         }
         return root;
@@ -180,12 +200,12 @@ public static class BinarySearchTree
     public static TNode Maximum<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>
     {
         while (true)
         {
             var right = nodeAdapter.GetRightChild(root);
-            if (right is null) break;
+            if (nodeAdapter.IsNil(right)) break;
             root = right;
         }
         return root;
@@ -203,12 +223,12 @@ public static class BinarySearchTree
     public static TNode? Predecessor<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
     {
         var nodeLeft = nodeAdapter.GetLeftChild(node);
-        if (nodeLeft is not null) return Maximum(nodeLeft, nodeAdapter);
+        if (nodeAdapter.IsNotNil(nodeLeft)) return Maximum(nodeLeft, nodeAdapter);
         var y = nodeAdapter.GetParent(node);
-        while (y is not null && ReferenceEquals(node, nodeAdapter.GetLeftChild(y)))
+        while (nodeAdapter.IsNotNil(y) && nodeAdapter.NodeEquals(node, nodeAdapter.GetLeftChild(y)))
         {
             node = y;
             y = nodeAdapter.GetParent(y);
@@ -228,12 +248,12 @@ public static class BinarySearchTree
     public static TNode? Successor<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
     {
         var nodeRight = nodeAdapter.GetRightChild(node);
-        if (nodeRight is not null) return Minimum(nodeRight, nodeAdapter);
+        if (nodeAdapter.IsNotNil(nodeRight)) return Minimum(nodeRight, nodeAdapter);
         var y = nodeAdapter.GetParent(node);
-        while (y is not null && ReferenceEquals(node, nodeAdapter.GetRightChild(y)))
+        while (nodeAdapter.IsNotNil(y) && nodeAdapter.NodeEquals(node, nodeAdapter.GetRightChild(y)))
         {
             node = y;
             y = nodeAdapter.GetParent(y);
@@ -259,11 +279,11 @@ public static class BinarySearchTree
         TNodeAdapter nodeAdapter,
         TKey key,
         TKeyComparer keyComparer)
-        where TNodeAdapter : IChildSelector<TNode>, IKeySelector<TNode, TKey>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IKeySelector<TNode, TKey>
         where TKeyComparer : IComparer<TKey>
     {
         (TNode Node, Child Child)? hint = null;
-        while (root is not null)
+        while (nodeAdapter.IsNotNil(root))
         {
             var rootKey = nodeAdapter.GetKey(root);
             var cmp = keyComparer.Compare(key, rootKey);
@@ -282,7 +302,7 @@ public static class BinarySearchTree
                 return new(Found: root);
             }
         }
-        return new(Hint: hint);
+        return new(Found: nodeAdapter.NilNode, Hint: hint);
     }
 
     /// <summary>
@@ -306,7 +326,8 @@ public static class BinarySearchTree
         TKey key,
         TData data,
         TKeyComparer keyComparer)
-        where TNodeAdapter : IChildSelector<TNode>,
+        where TNodeAdapter : INodeIdentity<TNode>,
+                             IChildSelector<TNode>,
                              IParentSelector<TNode>,
                              IKeySelector<TNode, TKey>,
                              INodeBuilder<TKey, TData, TNode>
@@ -315,7 +336,7 @@ public static class BinarySearchTree
         // Try a search
         var (found, hint) = Search(root, nodeAdapter, key, keyComparer);
         // If found, we don't do an insertion
-        if (found is not null) return new(Root: root!, Existing: found);
+        if (nodeAdapter.IsNotNil(found)) return new(Root: root!, Existing: found, Inserted: nodeAdapter.NilNode);
         // It's a new node, construct it
         var newNode = nodeAdapter.Build(key, data);
         // If there's a hint, use it
@@ -325,10 +346,10 @@ public static class BinarySearchTree
             if (hChild == Child.Left) nodeAdapter.SetLeftChild(hNode, newNode);
             else nodeAdapter.SetRightChild(hNode, newNode);
             nodeAdapter.SetParent(newNode, hNode);
-            return new(Root: root!, Inserted: newNode);
+            return new(Root: root!, Inserted: newNode, Existing: nodeAdapter.NilNode);
         }
         // Otherwise, this has to be a new root
-        return new(Root: newNode, Inserted: newNode);
+        return new(Root: newNode, Inserted: newNode, Existing: nodeAdapter.NilNode);
     }
 
     /// <summary>
@@ -345,26 +366,26 @@ public static class BinarySearchTree
         TNode? root,
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void Shift(TNode u, TNode? v)
         {
             var uParent = nodeAdapter.GetParent(u);
-            if (uParent is null) root = v;
-            else if (ReferenceEquals(u, nodeAdapter.GetLeftChild(uParent))) nodeAdapter.SetLeftChild(uParent, v);
+            if (nodeAdapter.IsNil(uParent)) root = v;
+            else if (nodeAdapter.NodeEquals(u, nodeAdapter.GetLeftChild(uParent))) nodeAdapter.SetLeftChild(uParent, v);
             else nodeAdapter.SetRightChild(uParent, v);
-            if (v is not null) nodeAdapter.SetParent(v, uParent);
+            if (nodeAdapter.IsNotNil(v)) nodeAdapter.SetParent(v, uParent);
         }
 
         TNode? parent;
-        if (nodeAdapter.GetLeftChild(node) is null)
+        if (nodeAdapter.IsNil(nodeAdapter.GetLeftChild(node)))
         {
             // 0 or 1 child
             parent = nodeAdapter.GetParent(node);
             Shift(node, nodeAdapter.GetRightChild(node));
         }
-        else if (nodeAdapter.GetRightChild(node) is null)
+        else if (nodeAdapter.IsNil(nodeAdapter.GetRightChild(node)))
         {
             // 0 or 1 child
             parent = nodeAdapter.GetParent(node);
@@ -373,15 +394,15 @@ public static class BinarySearchTree
         else
         {
             // 2 children
-            var y = Successor(node, nodeAdapter);
-            var yParent = nodeAdapter.GetParent(y!);
-            if (!ReferenceEquals(yParent, node))
+            var y = Successor(node, nodeAdapter)!;
+            var yParent = nodeAdapter.GetParent(y);
+            if (!nodeAdapter.NodeEquals(yParent, node))
             {
                 parent = yParent;
-                Shift(y!, nodeAdapter.GetRightChild(y!));
+                Shift(y, nodeAdapter.GetRightChild(y));
                 var nodeRight = nodeAdapter.GetRightChild(node);
-                nodeAdapter.SetRightChild(y!, nodeRight);
-                if (nodeRight is not null) nodeAdapter.SetParent(nodeRight, y);
+                nodeAdapter.SetRightChild(y, nodeRight);
+                if (nodeAdapter.IsNotNil(nodeRight)) nodeAdapter.SetParent(nodeRight, y);
             }
             else
             {
@@ -389,8 +410,8 @@ public static class BinarySearchTree
             }
             Shift(node, y);
             var nodeLeft = nodeAdapter.GetLeftChild(node);
-            nodeAdapter.SetLeftChild(y!, nodeLeft);
-            if (nodeLeft is not null) nodeAdapter.SetParent(nodeLeft, y);
+            nodeAdapter.SetLeftChild(y, nodeLeft);
+            if (nodeAdapter.IsNotNil(nodeLeft)) nodeAdapter.SetParent(nodeLeft, y);
         }
         return new(Root: root, Parent: parent);
     }
@@ -407,15 +428,15 @@ public static class BinarySearchTree
     public static TNode RotateLeft<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
     {
         var p = nodeAdapter.GetParent(root);
-        var y = nodeAdapter.GetRightChild(root)
-             ?? throw new InvalidOperationException("The right child can not be null");
-        if (p is not null)
+        var y = nodeAdapter.GetRightChild(root);
+        if (nodeAdapter.IsNil(y)) throw new InvalidOperationException("The right child can not be null");
+        if (nodeAdapter.IsNotNil(p))
         {
             var pLeft = nodeAdapter.GetLeftChild(p);
-            if (ReferenceEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, y);
+            if (nodeAdapter.NodeEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, y);
             else nodeAdapter.SetRightChild(p, y);
         }
         nodeAdapter.SetParent(y, p);
@@ -423,7 +444,7 @@ public static class BinarySearchTree
         nodeAdapter.SetLeftChild(y, root);
         nodeAdapter.SetParent(root, y);
         nodeAdapter.SetRightChild(root, t2);
-        if (t2 is not null) nodeAdapter.SetParent(t2, root);
+        if (nodeAdapter.IsNotNil(t2)) nodeAdapter.SetParent(t2, root);
         return y;
     }
 
@@ -439,15 +460,15 @@ public static class BinarySearchTree
     public static TNode RotateRight<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : IChildSelector<TNode>, IParentSelector<TNode>
+        where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
     {
         var p = nodeAdapter.GetParent(root);
-        var x = nodeAdapter.GetLeftChild(root)
-             ?? throw new InvalidOperationException("The left child can not be null");
-        if (p is not null)
+        var x = nodeAdapter.GetLeftChild(root);
+        if (nodeAdapter.IsNil(x)) throw new InvalidOperationException("The left child can not be null");
+        if (nodeAdapter.IsNotNil(p))
         {
             var pLeft = nodeAdapter.GetLeftChild(p);
-            if (ReferenceEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, x);
+            if (nodeAdapter.NodeEquals(pLeft, root)) nodeAdapter.SetLeftChild(p, x);
             else nodeAdapter.SetRightChild(p, x);
         }
         nodeAdapter.SetParent(x, p);
@@ -455,7 +476,7 @@ public static class BinarySearchTree
         nodeAdapter.SetRightChild(x, root);
         nodeAdapter.SetParent(root, x);
         nodeAdapter.SetLeftChild(root, t2);
-        if (t2 is not null) nodeAdapter.SetParent(t2, root);
+        if (nodeAdapter.IsNotNil(t2)) nodeAdapter.SetParent(t2, root);
         return x;
     }
 }

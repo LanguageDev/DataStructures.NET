@@ -96,7 +96,8 @@ public static class AvlTree
     public static TNode RotateLeft<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              IHeightSelector<TNode>
     {
@@ -118,7 +119,8 @@ public static class AvlTree
     public static TNode RotateRight<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              IHeightSelector<TNode>
     {
@@ -140,7 +142,8 @@ public static class AvlTree
     public static RebalanceResult<TNode> Rebalance<TNode, TNodeAdapter>(
         TNode root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              IHeightSelector<TNode>
     {
@@ -187,7 +190,8 @@ public static class AvlTree
         TKey key,
         TData data,
         TKeyComparer keyComparer)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              BinarySearchTree.IKeySelector<TNode, TKey>,
                              BinarySearchTree.INodeBuilder<TKey, TData, TNode>,
@@ -203,7 +207,7 @@ public static class AvlTree
             keyComparer: keyComparer);
 
         // If nothing is inserted, return here
-        if (insertion.Inserted is null) return new(Root: root!, Existing: insertion.Existing);
+        if (insertion.Inserted is null) return new(Root: root!, Existing: insertion.Existing, Inserted: nodeAdapter.NilNode);
 
         // There was a node inserted
         root = insertion.Root;
@@ -220,7 +224,7 @@ public static class AvlTree
         }
 
         // We are done
-        return new(Root: root, Inserted: insertion.Inserted);
+        return new(Root: root, Inserted: insertion.Inserted, Existing: nodeAdapter.NilNode);
     }
 
     /// <summary>
@@ -237,7 +241,8 @@ public static class AvlTree
         TNode? root,
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              IHeightSelector<TNode>
     {

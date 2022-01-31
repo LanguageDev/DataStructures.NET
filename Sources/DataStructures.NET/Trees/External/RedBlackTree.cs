@@ -73,7 +73,8 @@ public static class RedBlackTree
         TKey key,
         TData data,
         TKeyComparer keyComparer)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              BinarySearchTree.IKeySelector<TNode, TKey>,
                              BinarySearchTree.INodeBuilder<TKey, TData, TNode>,
@@ -89,7 +90,7 @@ public static class RedBlackTree
             keyComparer: keyComparer);
 
         // If nothing is inserted, return here
-        if (insertion.Inserted is null) return new(Root: root!, Existing: insertion.Existing);
+        if (insertion.Inserted is null) return new(Root: root!, Existing: insertion.Existing, Inserted: nodeAdapter.NilNode);
 
         // There was a node inserted
         root = insertion.Root;
@@ -105,7 +106,7 @@ public static class RedBlackTree
             if (parent is null) break;
 
             // Case I1: Parent is black
-            if (nodeAdapter.GetColor(parent) == Color.Black) return new(Root: root, Inserted: insertion.Inserted);
+            if (nodeAdapter.GetColor(parent) == Color.Black) return new(Root: root, Inserted: insertion.Inserted, Existing: nodeAdapter.NilNode);
 
             // Parent is red
             var grandparent = nodeAdapter.GetParent(parent);
@@ -113,7 +114,7 @@ public static class RedBlackTree
             {
                 // Case I4
                 nodeAdapter.SetColor(parent, Color.Black);
-                return new(Root: root, Inserted: insertion.Inserted);
+                return new(Root: root, Inserted: insertion.Inserted, Existing: nodeAdapter.NilNode);
             }
 
             // Parent is red, grandparent is not null
@@ -149,7 +150,7 @@ public static class RedBlackTree
                 if (ReferenceEquals(root, grandparent)) root = rotateRoot;
                 nodeAdapter.SetColor(parent, Color.Black);
                 nodeAdapter.SetColor(grandparent, Color.Red);
-                return new(Root: root, Inserted: insertion.Inserted);
+                return new(Root: root, Inserted: insertion.Inserted, Existing: nodeAdapter.NilNode);
             }
 
             // Case I2 (parent and uncle are red)
@@ -160,7 +161,7 @@ public static class RedBlackTree
         }
 
         // Case I3
-        return new(Root: root, Inserted: insertion.Inserted);
+        return new(Root: root, Inserted: insertion.Inserted, Existing: nodeAdapter.NilNode);
     }
 
     /// <summary>
@@ -177,7 +178,8 @@ public static class RedBlackTree
         TNode? root,
         TNode node,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>,
                              IColorSelector<TNode>
     {

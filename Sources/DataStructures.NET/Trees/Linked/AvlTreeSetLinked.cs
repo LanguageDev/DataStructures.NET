@@ -61,12 +61,18 @@ public class AvlTreeSetLinked<T, TComparer> : ISet<T>
     }
 
     internal readonly struct NodeAdapter :
+        BinarySearchTree.INodeIdentity<Node>,
         BinarySearchTree.IChildSelector<Node>,
         BinarySearchTree.IParentSelector<Node>,
         AvlTree.IHeightSelector<Node>,
         BinarySearchTree.IKeySelector<Node, T>,
         BinarySearchTree.INodeBuilder<T, bool, Node>
     {
+        public Node? NilNode => null;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool NodeEquals(Node? n1, Node? n2) => ReferenceEquals(n1, n2);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Node? GetLeftChild(Node node) => node.Left;
 

@@ -16,27 +16,28 @@ public static class TreeValidation
         TNode? root,
         TNodeAdapter nodeAdapter,
         Func<TNode, string> nodeCtor)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>
     {
         var builder = new StringBuilder();
 
         void Impl(TNode? node)
         {
-            if (node is null) return;
+            if (nodeAdapter.IsNil(node)) return;
             builder.Append("new(").Append(nodeCtor(node)).Append(')');
             var left = nodeAdapter.GetLeftChild(node);
             var right = nodeAdapter.GetRightChild(node);
-            if (left is not null || right is not null)
+            if (nodeAdapter.IsNotNil(left) || nodeAdapter.IsNotNil(right))
             {
                 builder.Append(" { ");
-                if (left is not null)
+                if (nodeAdapter.IsNotNil(left))
                 {
                     builder.Append("Left = ");
                     Impl(left);
                     builder.Append(", ");
                 }
-                if (right is not null)
+                if (nodeAdapter.IsNotNil(right))
                 {
                     builder.Append("Right = ");
                     Impl(right);
@@ -53,39 +54,40 @@ public static class TreeValidation
     public static void ValidateAdjacency<TNode, TNodeAdapter>(
         TNode? root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              BinarySearchTree.IParentSelector<TNode>
     {
         void Impl(TNode? node)
         {
             // An empty subtree is always valid
-            if (node is null) return;
+            if (nodeAdapter.IsNil(node)) return;
 
             var left = nodeAdapter.GetLeftChild(node);
             var right = nodeAdapter.GetRightChild(node);
-            if (left is not null)
+            if (nodeAdapter.IsNotNil(left))
             {
                 // If there is a left child, its parent has to be this node
                 var leftParent = nodeAdapter.GetParent(left);
-                if (!ReferenceEquals(leftParent, node)) throw new ValidationException("Adjacency error: The left node's parent is not the node");
+                if (!nodeAdapter.NodeEquals(leftParent, node)) throw new ValidationException("Adjacency error: The left node's parent is not the node");
                 // Recursively validate
                 Impl(left);
             }
-            if (right is not null)
+            if (nodeAdapter.IsNotNil(right))
             {
                 // If there is a right child, its parent has to be this node
                 var rightParent = nodeAdapter.GetParent(right);
-                if (!ReferenceEquals(rightParent, node)) throw new ValidationException("Adjacency error: The right node's parent is not the node");
+                if (!nodeAdapter.NodeEquals(rightParent, node)) throw new ValidationException("Adjacency error: The right node's parent is not the node");
                 // Recursively validate
                 Impl(right);
             }
         }
 
         // An empty tree is always valid
-        if (root is null) return;
+        if (nodeAdapter.IsNil(root)) return;
 
         // The parent of a root node must always be valid
-        if (nodeAdapter.GetParent(root) is not null) throw new ValidationException("Adjacency error: The parent of root is not null");
+        if (nodeAdapter.IsNotNil(nodeAdapter.GetParent(root))) throw new ValidationException("Adjacency error: The parent of root is not null");
 
         // Recursively validate
         Impl(root);
@@ -96,7 +98,8 @@ public static class TreeValidation
         TNodeAdapter nodeAdapter,
         Func<TNode, TData> dataSelector,
         IEnumerable<TData> expected)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>
     {
         // Keep the remaining elements in a set
         var remaining = expected.ToHashSet();
@@ -104,7 +107,7 @@ public static class TreeValidation
         void Impl(TNode? node)
         {
             // No more data in this subtree
-            if (node is null) return;
+            if (nodeAdapter.IsNil(node)) return;
             // The remaining set must have had this data, otherwise the tree contained something extra
             var data = dataSelector(node);
             if (!remaining!.Remove(data)) throw new ValidationException($"Content error: The element {data} was not expected to be present in the tree");
@@ -122,22 +125,23 @@ public static class TreeValidation
     public static void ValidateBalanceAndHeight<TNode, TNodeAdapter>(
         TNode? root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              AvlTree.IHeightSelector<TNode>
     {
         int Impl(TNode? node)
         {
-            if (node is null) return 0;
+            if (nodeAdapter.IsNil(node)) return 0;
 
             var left = nodeAdapter.GetLeftChild(node);
             var right = nodeAdapter.GetRightChild(node);
 
             var leftExpHeight = Impl(left);
-            var leftActHeight = left is null ? 0 : nodeAdapter.GetHeight(left);
+            var leftActHeight = nodeAdapter.IsNil(left) ? 0 : nodeAdapter.GetHeight(left);
             if (leftExpHeight != leftActHeight) throw new ValidationException($"Height error: The left node's height ({leftActHeight}) does not match the expected ({leftExpHeight})");
 
             var rightExpHeight = Impl(right);
-            var rightActHeight = right is null ? 0 : nodeAdapter.GetHeight(right);
+            var rightActHeight = nodeAdapter.IsNil(right) ? 0 : nodeAdapter.GetHeight(right);
             if (rightExpHeight != rightActHeight) throw new ValidationException($"Height error: The right node's height ({rightActHeight}) does not match the expected ({rightExpHeight})");
 
             var balance = leftActHeight - rightActHeight;
@@ -147,21 +151,22 @@ public static class TreeValidation
         }
 
         var rootExpHeight = Impl(root);
-        var rootActHeight = root is null ? 0 : nodeAdapter.GetHeight(root);
+        var rootActHeight = nodeAdapter.IsNil(root) ? 0 : nodeAdapter.GetHeight(root);
         if (rootExpHeight != rootActHeight) throw new ValidationException($"Height error: The root's height ({rootActHeight}) does not match the expected ({rootExpHeight})");
     }
 
     public static void ValidateRedBlack<TNode, TNodeAdapter>(
         TNode? root,
         TNodeAdapter nodeAdapter)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>,
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>,
                              RedBlackTree.IColorSelector<TNode>
     {
         // NOTE: Returns black height
         int Impl(TNode? node)
         {
             // Consider NIL as a black node
-            if (node is null) return 1;
+            if (nodeAdapter.IsNil(node)) return 1;
 
             var left = nodeAdapter.GetLeftChild(node);
             var right = nodeAdapter.GetRightChild(node);
@@ -169,8 +174,8 @@ public static class TreeValidation
             if (nodeAdapter.GetColor(node) == RedBlackTree.Color.Red)
             {
                 // Can not have red children
-                if (left is not null && nodeAdapter.GetColor(left) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Left child of a red node is red");
-                if (right is not null && nodeAdapter.GetColor(right) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Right child of a red node is red");
+                if (nodeAdapter.IsNotNil(left) && nodeAdapter.GetColor(left) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Left child of a red node is red");
+                if (nodeAdapter.IsNotNil(right) && nodeAdapter.GetColor(right) == RedBlackTree.Color.Red) throw new ValidationException($"Child color error: Right child of a red node is red");
             }
 
             var leftBlackHeight = Impl(left);
@@ -189,10 +194,11 @@ public static class TreeValidation
         TNode? root2,
         TNodeAdapter nodeAdapter,
         Func<TNode, TNode, bool> nodeEquals)
-        where TNodeAdapter : BinarySearchTree.IChildSelector<TNode>
+        where TNodeAdapter : BinarySearchTree.INodeIdentity<TNode>,
+                             BinarySearchTree.IChildSelector<TNode>
     {
-        if (ReferenceEquals(root1, root2)) return;
-        if (root1 is null || root2 is null) throw new ValidationException($"Equality error: The left or right subtree terminated early");
+        if (nodeAdapter.NodeEquals(root1, root2)) return;
+        if (nodeAdapter.IsNil(root1) || nodeAdapter.IsNil(root2)) throw new ValidationException($"Equality error: The left or right subtree terminated early");
         if (!nodeEquals(root1!, root2!)) throw new ValidationException($"Equality error: The contents of the nodes are not equal");
 
         var root1Left = nodeAdapter.GetLeftChild(root1!);

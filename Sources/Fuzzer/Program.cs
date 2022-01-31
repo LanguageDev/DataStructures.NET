@@ -11,7 +11,7 @@ internal class Program
     {
         try
         {
-            SetFuzzer.FuzzRedBlackTree(100);
+            SetFuzzer.FuzzBinarySearchTreeSetLinked(100);
         }
         catch (FuzzerException f)
         {

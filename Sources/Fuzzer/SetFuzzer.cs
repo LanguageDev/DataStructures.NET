@@ -63,14 +63,14 @@ internal class SetFuzzer
         }
     }
 
-    public static void FuzzBst(int maxElements) =>
+    public static void FuzzBinarySearchTreeSetLinked(int maxElements) =>
         Fuzz(maxElements, () => new BstSet(Comparer<int>.Default), BstValidator.Instance);
 
-    public static void FuzzAvlTree(int maxElements) =>
-        Fuzz(maxElements, () => new AvlTreeSet(Comparer<int>.Default), AvlTreeValidator.Instance);
+    public static void FuzzAvlTreeSetLinked(int maxElements) =>
+        Fuzz(maxElements, () => new AvlTreeSetLinked(Comparer<int>.Default), AvlTreeValidator.Instance);
 
-    public static void FuzzRedBlackTree(int maxElements) =>
-        Fuzz(maxElements, () => new RedBlackTreeSet(Comparer<int>.Default), RedBlackTreeValidator.Instance);
+    public static void FuzzRedBlackTreeSetLinked(int maxElements) =>
+        Fuzz(maxElements, () => new RedBlackTreeSetLinked(Comparer<int>.Default), RedBlackTreeValidator.Instance);
 
     public static void Fuzz<TTested>(
         int maxElements,
