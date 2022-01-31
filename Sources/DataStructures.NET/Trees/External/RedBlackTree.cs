@@ -194,7 +194,7 @@ public static class RedBlackTree
         {
             // TODO: There has to be a nicer way...
             // Successor has at most one non-null child
-            var successor = BinarySearchTree.Successor(node, nodeAdapter)!;
+            var successor = BinarySearchTree.InOrderSuccessor(node, nodeAdapter)!;
             // We swap out the two nodes
             // Neighbors
             var successorLeft = nodeAdapter.GetLeftChild(successor);

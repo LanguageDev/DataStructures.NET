@@ -220,7 +220,7 @@ public static class BinarySearchTree
     /// <param name="nodeAdapter">The node adapter.</param>
     /// <returns>The predecessor of <paramref name="node"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNode? Predecessor<TNode, TNodeAdapter>(
+    public static TNode? InOrderPredecessor<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
         where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
@@ -245,7 +245,7 @@ public static class BinarySearchTree
     /// <param name="nodeAdapter">The node adapter.</param>
     /// <returns>The successor of <paramref name="node"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNode? Successor<TNode, TNodeAdapter>(
+    public static TNode? InOrderSuccessor<TNode, TNodeAdapter>(
         TNode node,
         TNodeAdapter nodeAdapter)
         where TNodeAdapter : INodeIdentity<TNode>, IChildSelector<TNode>, IParentSelector<TNode>
@@ -394,7 +394,7 @@ public static class BinarySearchTree
         else
         {
             // 2 children
-            var y = Successor(node, nodeAdapter)!;
+            var y = InOrderSuccessor(node, nodeAdapter)!;
             var yParent = nodeAdapter.GetParent(y);
             if (!nodeAdapter.NodeEquals(yParent, node))
             {
