@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using DataStructures.NET.Trees.Array;
 using DataStructures.NET.Trees.Linked;
 
 namespace Benchmarks.Trees;
@@ -24,8 +25,9 @@ public class BstInsertBenchmarks
 
     private readonly List<int> numbers = new();
 
-    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSet = new(default);
-    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSetLinked = new(default);
+    private readonly BinarySearchTreeSetArray<int, IntComparer> dsnSetArray = new(default);
+    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetLinkedIComparer = new(Comparer<int>.Default);
     private readonly BinaryTree.BinaryTree<int> marusykSet = new();
     private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
@@ -39,22 +41,29 @@ public class BstInsertBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        this.dsnSet.Clear();
-        this.dsnSetIComparer.Clear();
+        this.dsnSetLinked.Clear();
+        this.dsnSetArray.Clear();
+        this.dsnSetLinkedIComparer.Clear();
         this.marusykSet.Clear();
         this.schuchmannSet.Root = null;
     }
     
     [Benchmark]
-    public void DataStructuresNET()
+    public void DataStructuresNET_Linked()
     {
-        foreach (var item in this.numbers) this.dsnSet.Add(item);
+        foreach (var item in this.numbers) this.dsnSetLinked.Add(item);
     }
 
     [Benchmark]
-    public void DataStructuresNET_IComparer()
+    public void DataStructuresNET_Array()
     {
-        foreach (var item in this.numbers) this.dsnSetIComparer.Add(item);
+        foreach (var item in this.numbers) this.dsnSetArray.Add(item);
+    }
+
+    [Benchmark]
+    public void DataStructuresNET_LinkedIComparer()
+    {
+        foreach (var item in this.numbers) this.dsnSetLinkedIComparer.Add(item);
     }
 
     [Benchmark]
@@ -84,8 +93,9 @@ public class BstDeleteBenchmarks
     private readonly List<int> numbersToAdd = new();
     private readonly List<int> numbersToRemove = new();
 
-    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSet = new(default);
-    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetIComparer = new(Comparer<int>.Default);
+    private readonly BinarySearchTreeSetLinked<int, IntComparer> dsnSetLinked = new(default);
+    private readonly BinarySearchTreeSetArray<int, IntComparer> dsnSetArray = new(default);
+    private readonly BinarySearchTreeSetLinked<int, IComparer<int>> dsnSetLinkedIComparer = new(Comparer<int>.Default);
     private readonly BinaryTree.BinaryTree<int> marusykSet = new();
     private readonly SchuchmannBst.BinarySearchTree<int> schuchmannSet = new();
 
@@ -103,30 +113,38 @@ public class BstDeleteBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        this.dsnSet.Clear();
-        this.dsnSetIComparer.Clear();
+        this.dsnSetLinked.Clear();
+        this.dsnSetArray.Clear();
+        this.dsnSetLinkedIComparer.Clear();
         this.marusykSet.Clear();
         this.schuchmannSet.Root = null;
 
         foreach (var item in this.numbersToAdd)
         {
-            this.dsnSet.Add(item);
-            this.dsnSetIComparer.Add(item);
+            this.dsnSetLinked.Add(item);
+            this.dsnSetArray.Add(item);
+            this.dsnSetLinkedIComparer.Add(item);
             this.marusykSet.Add(item);
             this.schuchmannSet.Insert(item);
         }
     }
 
     [Benchmark]
-    public void DataStructuresNET()
+    public void DataStructuresNET_Linked()
     {
-        foreach (var item in this.numbersToRemove) this.dsnSet.Remove(item);
+        foreach (var item in this.numbersToRemove) this.dsnSetLinked.Remove(item);
     }
 
     [Benchmark]
-    public void DataStructuresNET_IComparer()
+    public void DataStructuresNET_Array()
     {
-        foreach (var item in this.numbersToRemove) this.dsnSetIComparer.Remove(item);
+        foreach (var item in this.numbersToRemove) this.dsnSetArray.Remove(item);
+    }
+
+    [Benchmark]
+    public void DataStructuresNET_LinkedIComparer()
+    {
+        foreach (var item in this.numbersToRemove) this.dsnSetLinkedIComparer.Remove(item);
     }
 
     [Benchmark]

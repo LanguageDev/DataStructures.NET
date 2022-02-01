@@ -13,7 +13,8 @@ internal class Program
         {
             //SetFuzzer.FuzzBinarySearchTreeSetLinked(100);
             //SetFuzzer.FuzzAvlTreeSetLinked(100);
-            SetFuzzer.FuzzRedBlackTreeSetLinked(100);
+            //SetFuzzer.FuzzRedBlackTreeSetLinked(100);
+            SetFuzzer.FuzzBinarySearchTreeSetArray(100);
         }
         catch (FuzzerException f)
         {

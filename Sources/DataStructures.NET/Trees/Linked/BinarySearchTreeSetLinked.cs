@@ -157,7 +157,11 @@ public class BinarySearchTreeSetLinked<T, TComparer> : ISet<T>
     }
 
     /// <inheritdoc/>
-    public void Clear() => this.Root = null;
+    public void Clear()
+    {
+        this.Root = null;
+        this.Count = 0;
+    }
 
     /// <inheritdoc/>
     public void CopyTo(T[] array, int arrayIndex)
