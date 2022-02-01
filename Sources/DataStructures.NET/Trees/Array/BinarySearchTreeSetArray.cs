@@ -25,7 +25,9 @@ public class BinarySearchTreeSetArray<T, TComparer> : ISet<T>
     internal class Container
     {
         public List<T> Keys { get; } = new();
-        public List<NeighborData> Neighbors { get; } = new();
+        public List<int> Left { get; } = new();
+        public List<int> Right { get; } = new();
+        public List<int> Parent { get; } = new();
     }
 
     // TODO: This structure never shrinks, the abadoned nodes stay in the list
@@ -44,25 +46,22 @@ public class BinarySearchTreeSetArray<T, TComparer> : ISet<T>
         public bool NodeEquals(int n1, int n2) => n1 == n2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetLeftChild(int node) => this.container.Neighbors[node].Left;
+        public int GetLeftChild(int node) => this.container.Left[node];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetRightChild(int node) => this.container.Neighbors[node].Right;
+        public int GetRightChild(int node) => this.container.Right[node];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetParent(int node) => this.container.Neighbors[node].Parent;
+        public int GetParent(int node) => this.container.Parent[node];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetLeftChild(int node, int child) => this.container.Neighbors[node] =
-            this.container.Neighbors[node] with { Left = child };
+        public void SetLeftChild(int node, int child) => this.container.Left[node] = child;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRightChild(int node, int child) => this.container.Neighbors[node] =
-            this.container.Neighbors[node] with { Right = child };
+        public void SetRightChild(int node, int child) => this.container.Right[node] = child;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetParent(int node, int parent) => this.container.Neighbors[node] =
-            this.container.Neighbors[node] with { Parent = parent };
+        public void SetParent(int node, int parent) => this.container.Parent[node] = parent;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T GetKey(int node) => this.container.Keys[node];
@@ -72,7 +71,9 @@ public class BinarySearchTreeSetArray<T, TComparer> : ISet<T>
         {
             var idx = this.container.Keys.Count;
             this.container.Keys.Add(key);
-            this.container.Neighbors.Add(new(this.NilNode, this.NilNode, this.NilNode));
+            this.container.Left.Add(-1);
+            this.container.Right.Add(-1);
+            this.container.Parent.Add(0);
             return idx;
         }
     }
@@ -151,7 +152,9 @@ public class BinarySearchTreeSetArray<T, TComparer> : ISet<T>
     {
         this.Root = -1;
         this.Adapter.container.Keys.Clear();
-        this.Adapter.container.Neighbors.Clear();
+        this.Adapter.container.Left.Clear();
+        this.Adapter.container.Right.Clear();
+        this.Adapter.container.Parent.Clear();
     }
 
     /// <inheritdoc/>
